@@ -11,7 +11,7 @@ today = datetime.now().date()
 
 # Connection details to IBKR
 HOST = '127.0.0.1'
-PORT = port()
+PORT = port
 CLIENT_ID = 1  # Unique for each connection
 
 index = ['GERMANY', 'FRANCE', 'US9', 'ITALY', 'SPAIN', 'BELGIUM', 'US IPO']

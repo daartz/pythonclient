@@ -85,6 +85,11 @@ class OpenOrdersApp(EWrapper, EClient):
 
         data = data.sort_values(by='symbol')
 
+        try:
+            data = data.drop_duplicates(subset=['orderId'])
+        except:
+            pass
+
         html_data = '<p>(TWS) Open Orders</p>' + data.to_html()
 
         send_mail_html("IBKR TWS Open Orders "+ str(self.port_code), html_data)
@@ -100,6 +105,12 @@ class OpenOrdersApp(EWrapper, EClient):
             print("OrderId present for " + action + ", side " + side)
             data = pd.read_csv(f"C:\\TWS API\\source\\pythonclient\\tests\\Data\\open_orders_{self.port_code}.csv",
                                index_col=0)
+
+            try:
+                data = data.drop_duplicates(subset=['orderId'])
+            except:
+                pass
+
             data = data[data['action'] == side]
             data = data[data['symbol'] == action]
             data = data[data['secType'] == 'STK']
@@ -117,6 +128,12 @@ class OpenOrdersApp(EWrapper, EClient):
 
         if os.path.exists(csv_file_path) and os.path.getsize(csv_file_path) > 0:
             data = pd.read_csv(csv_file_path, index_col=0)
+
+            try:
+                data = data.drop_duplicates(subset=['orderId'])
+            except:
+                pass
+
             print("----ALL ORDERID " + str(self.port_code) + "----")
             return list(set(data['orderId'].values))
         else:

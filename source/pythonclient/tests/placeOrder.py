@@ -327,6 +327,12 @@ class TradingApp(EWrapper, EClient):
         file = f"C:\\TWS API\\source\\pythonclient\\tests\\Data\\open_orders_{self.port_code}.csv"
         try:
             data = pd.read_csv(file, index_col=0)
+
+            try:
+                data = data.drop_duplicates(subset=['orderId'])
+            except:
+                pass
+
             data = data[data['action'] == side]
             data = data[data['symbol'] == stock]
             data = data[data['secType'] == 'STK']
@@ -351,6 +357,10 @@ class TradingApp(EWrapper, EClient):
 
         if os.path.exists(csv_file_path) and os.path.getsize(csv_file_path) > 0:
             data = pd.read_csv(csv_file_path, index_col=0)
+            try:
+                data = data.drop_duplicates(subset=['orderId'])
+            except:
+                pass
             orderIds = list(set(data['orderId'].values))
             print("("+self.port_code+")----ALL ORDERID----")
             print(orderIds)
@@ -364,6 +374,11 @@ class TradingApp(EWrapper, EClient):
         data = pd.read_csv(file, index_col=0)
 
         data = data.reset_index(drop=True)
+
+        try:
+            data = data.drop_duplicates(subset=['orderId'])
+        except:
+            pass
 
         html_data = '<p>(TWS) Open Orders (from reelOrders.py)</p>' + data.to_html()
 

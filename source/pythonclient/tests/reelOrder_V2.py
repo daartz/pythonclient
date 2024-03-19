@@ -25,13 +25,11 @@ def process_orders(port, index_list, sendMail = True):
     app = TradingApp(PORT)
     app.connect(HOST, PORT, CLIENT_ID)
 
-
     tps.sleep(2)
     app.reqOpenOrders()
     tps.sleep(5)
     app.all_orderId()
     tps.sleep(5)
-
 
     file = f"C:\\TWS API\\source\\pythonclient\\tests\\Data\\portfolio_{port}.csv"
 
