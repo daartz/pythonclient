@@ -159,6 +159,8 @@ def process_orders(port, index_list, sendMail = True):
         if sendMail:
             app.sendOpenOrders()
 
+
+
     # Disconnect after processing all files
     try:
         app.run()
