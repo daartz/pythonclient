@@ -11,13 +11,13 @@ today = datetime.now().date()
 
 # Connection details to IBKR
 HOST = '127.0.0.1'
-PORT = port
+PORT = port()
 CLIENT_ID = 1  # Unique for each connection
 
 index = ['GERMANY', 'FRANCE', 'US9', 'ITALY', 'SPAIN', 'BELGIUM', 'US IPO']
 # index = ['US9']
 # Initialize the trading application
-app = TradingApp(port())
+app = TradingApp(PORT)
 app.connect(HOST, PORT, CLIENT_ID)
 
 tps.sleep(2)
@@ -33,8 +33,8 @@ orders = ['buy', 'sell']
 for country in index:
     print(country)
 
-    # if opening_hours(country) == False:
-    #     continue
+    if opening_hours(country) == False:
+        continue
 
     for order in orders:
 

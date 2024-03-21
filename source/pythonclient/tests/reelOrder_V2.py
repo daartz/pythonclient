@@ -42,10 +42,10 @@ def process_orders(port, index_list, sendMail = True):
     for country in index:
         print(country)
 
-        if not opening_hours(country):
+        if opening_hours(country) == False:
             continue
 
-        if not closing_hours(country):
+        if closing_hours(country) == False:
             continue
 
         for order in orders:
