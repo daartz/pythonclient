@@ -60,6 +60,8 @@ def buy_order(quantity):
     return order
 
 
+
+
 # Fonction pour créer un ordre stop limit suiveur
 def trailing_stop_order(quantity, trailStopPrice=None, trailAmt=None, trailPercent=None):
     """
@@ -164,6 +166,19 @@ class TradingApp(EWrapper, EClient):
         order.transmit = True
 
         print("("+ self.port_code +") Buy Order created : " + order.orderType + " - Qty : " + str(order.totalQuantity) + " - " + order.action)
+        return
+
+    def sell_order(self, quantity):
+        order = Order()
+        order.orderType = "MKT"
+        order.totalQuantity = quantity
+        order.action = "SELL"
+        order.eTradeOnly = False
+        order.firmQuoteOnly = False
+        order.transmit = True
+
+        print("SELL Order created : " + order.orderType + " - Qty : " + str(
+            order.totalQuantity) + " - " + order.action)
         return order
 
     # Fonction pour créer un ordre stop limit suiveur

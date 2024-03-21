@@ -141,11 +141,7 @@ def process_orders(port, index_list, sendMail = True):
                                     tps.sleep(0.30)
 
                                 quantity = app.getPosition(stock)
-                                trailPercent = 1
-                                trailAmt = round(price * trailPercent / 100, 2)
-                                order = app.trailing_stop_order(quantity, trailStopPrice=row['SELL'], trailAmt=trailAmt,
-                                                            trailPercent=trailPercent)
-
+                                order = app.sell_order(quantity)
                                 app.add_order(contract, order)
                                 tps.sleep(1)
                             else:
