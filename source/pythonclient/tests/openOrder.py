@@ -90,7 +90,7 @@ class OpenOrdersApp(EWrapper, EClient):
         except:
             pass
 
-        html_data = '<p>(TWS) Open Orders</p>' + data.to_html()
+        html_data = '<p>(TWS) Open Orders '+ str(self.port_code)+'</p>' + data.to_html()
 
         send_mail_html("IBKR TWS Open Orders "+ str(self.port_code), html_data)
 
@@ -155,10 +155,11 @@ def main_openOrder(port):
     # Retrieve specific orderId
     print(app.all_orderId())
 
-    time.sleep(2)  # Wait for orders to be returned and processed
+    # time.sleep(2)  # Wait for orders to be returned and processed
 
-    app.sendOpenOrders()
-    time.sleep(0.5)
+    # Send openOrders by mail
+    # app.sendOpenOrders()
+    # time.sleep(0.5)
 
     app.disconnect()  # Disconnect when done
 

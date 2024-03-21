@@ -9,7 +9,7 @@ port_list = [port_perso_test(), port_perso_prod(), port_pro_prod()]
 
 index_pro = [ 'US9']
 index_perso = ['US IPO']
-index_test = ['GERMANY', 'FRANCE', 'US9', 'ITALY', 'SPAIN', 'BELGIUM', 'US IPO', "NDL", "SWITZERLAND"]
+index_test = ['GERMANY', 'FRANCE', 'US9', 'ITALY', 'SPAIN', 'BELGIUM', 'US IPO', "NDL"]
 
 def process_reel_order(port_code, index, sendMail = True):
     try:
