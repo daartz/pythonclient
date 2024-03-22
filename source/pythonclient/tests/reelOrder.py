@@ -1,9 +1,9 @@
-import os
+import time as tps
 from threading import Thread
+
+from connection_port import *
 from marketHours import *
 from placeOrder import *
-from connection_port import *
-import time as tps
 from send_mail import *
 
 # Current date in YYYY-MM-DD format
@@ -14,8 +14,8 @@ HOST = '127.0.0.1'
 PORT = port()
 CLIENT_ID = 1  # Unique for each connection
 
-index = ['GERMANY', 'FRANCE', 'US9', 'ITALY', 'SPAIN', 'BELGIUM', 'US IPO']
-# index = ['US9']
+index = ['GERMANY', 'FRANCE', 'US9', 'ITALY', 'SPAIN', 'BELGIUM', 'US IPO','AUSTRALIA']
+index = ['US9']
 # Initialize the trading application
 app = TradingApp(PORT)
 app.connect(HOST, PORT, CLIENT_ID)
@@ -28,13 +28,13 @@ tps.sleep(3)
 
 data = pd.read_csv("C:\\TWS API\\source\\pythonclient\\tests\\Data\\positions.csv", index_col=0)
 
-orders = ['buy', 'sell']
+orders = ['buy','sell']
 
 for country in index:
     print(country)
 
-    if opening_hours(country) == False:
-        continue
+    # if opening_hours(country) == False:
+    #     continue
 
     for order in orders:
 
@@ -81,6 +81,9 @@ for country in index:
             elif "US" in country and country != "US9":
                 currency = "USD"
                 valq = 1000
+            elif "AUSTRALIA" in country:
+                currency = "AUD"
+                valq = 1000
             else:
                 currency = "EUR"
                 valq = 1000
@@ -91,8 +94,8 @@ for country in index:
 
             contract = app.create_contract(stock, secType, exchange, currency)
 
-            # if order_type == "BUY" :
-            if order_type == "BUY" and closing_hours(country):
+            if order_type == "BUY" :
+            # if order_type == "BUY" and closing_hours(country):
                 if app.find_position(stock):
                     continue
 
@@ -106,11 +109,11 @@ for country in index:
                 trailPercent = 4
                 trailAmt = round(price * trailPercent / 100, 2)
                 trailStopPrice = row['STOP']
-                order = app.buy_order(quantity)
+                order = buy_order(quantity)
                 app.add_order(contract, order)
 
                 order = app.trailing_stop_order(quantity, trailStopPrice=trailStopPrice, trailAmt=trailAmt,
-                                            trailPercent=trailPercent)
+                                                trailPercent=trailPercent)
                 app.add_order(contract, order)
                 tps.sleep(2)
 
@@ -132,7 +135,7 @@ for country in index:
                             trailPercent = 1
                             trailAmt = round(price * trailPercent / 100, 2)
                             order = app.trailing_stop_order(quantity, trailStopPrice=row['SELL'], trailAmt=trailAmt,
-                                                        trailPercent=trailPercent)
+                                                            trailPercent=trailPercent)
 
                             app.add_order(contract, order)
                             tps.sleep(2)
@@ -158,4 +161,3 @@ except Exception as e:
     print("Error:", e)
 finally:
     app.disconnect()
-

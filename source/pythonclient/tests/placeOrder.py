@@ -55,8 +55,22 @@ def buy_order(quantity):
     order.eTradeOnly = False
     order.firmQuoteOnly = False
     order.transmit = True
+    # order.outsideRth = True
 
     print("Buy Order created : " + order.orderType + " - Qty : " + str(order.totalQuantity) + " - " + order.action)
+    return order
+
+def sell_order(quantity):
+    order = Order()
+    order.orderType = "MKT"
+    order.totalQuantity = quantity
+    order.action = "SELL"
+    order.eTradeOnly = False
+    order.firmQuoteOnly = False
+    order.transmit = True
+    # order.outsideRth = True
+
+    print("Sell Order created : " + order.orderType + " - Qty : " + str(order.totalQuantity) + " - " + order.action)
     return order
 
 
@@ -156,17 +170,6 @@ class TradingApp(EWrapper, EClient):
         print("("+ self.port_code +") Contract created :" + symbol + " - " + secType + " - " + exchange + " - " + currency)
         return contract
 
-    def buy_order(self,quantity):
-        order = Order()
-        order.orderType = "MKT"
-        order.totalQuantity = quantity
-        order.action = "BUY"
-        order.eTradeOnly = False
-        order.firmQuoteOnly = False
-        order.transmit = True
-
-        print("("+ self.port_code +") Buy Order created : " + order.orderType + " - Qty : " + str(order.totalQuantity) + " - " + order.action)
-        return
 
     def sell_order(self, quantity):
         order = Order()

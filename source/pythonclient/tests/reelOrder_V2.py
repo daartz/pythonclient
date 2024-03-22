@@ -37,16 +37,16 @@ def process_orders(port, index_list, sendMail = True):
 
     index = index_list
 
-    orders = ['buy', 'sell']
+    orders = ['buy','sell']
 
     for country in index:
         print(country)
-
-        if opening_hours(country) == False:
-            continue
-
-        if closing_hours(country) == False:
-            continue
+        #
+        # if opening_hours(country) == False:
+        #     continue
+        #
+        # if closing_hours(country) == False:
+        #     continue
 
         for order in orders:
 
@@ -105,26 +105,32 @@ def process_orders(port, index_list, sendMail = True):
 
                 # if order_type == "BUY" and closing_hours(country):
                 if order_type == "BUY" :
-                    if app.find_position(stock):
-                        continue
+                    try:
+                        if app.find_position(stock):
+                            continue
 
-                    tps.sleep(1)
+                        tps.sleep(1)
 
-                    orderId_list = app.orderId_present(stock, "BUY", currency=currency)
+                        orderId_list = app.orderId_present(stock, "BUY", currency=currency)
 
-                    if len(orderId_list) != 0:
-                        continue
+                        if len(orderId_list) != 0:
+                            continue
 
-                    trailPercent = 4
-                    trailAmt = round(price * trailPercent / 100, 2)
-                    trailStopPrice = row['STOP']
-                    order = app.buy_order(quantity)
-                    app.add_order(contract, order)
+                        trailPercent = 4
+                        trailAmt = round(price * trailPercent / 100, 2)
+                        trailStopPrice = row['STOP']
+                        buyOrder = buy_order(quantity)
+                        app.add_order(contract, buyOrder)
 
-                    order = app.trailing_stop_order(quantity, trailStopPrice=trailStopPrice, trailAmt=trailAmt,
-                                                trailPercent=trailPercent)
-                    app.add_order(contract, order)
-                    tps.sleep(1)
+                        tps.sleep(0.5)
+
+                        trail0rder = app.trailing_stop_order(quantity, trailStopPrice=trailStopPrice, trailAmt=trailAmt,
+                                                    trailPercent=trailPercent)
+                        app.add_order(contract, trail0rder)
+                        tps.sleep(1)
+
+                    except:
+                        pass
 
                 elif order_type == "SELL":
                     try:
@@ -138,17 +144,17 @@ def process_orders(port, index_list, sendMail = True):
                             if len(orderId_list) != 0:
                                 for num in orderId_list:
                                     app.cancelOrder(num, manualCancelOrderTime=formatted_cancel_time)
-                                    tps.sleep(0.30)
+                                    tps.sleep(0.50)
 
                                 quantity = app.getPosition(stock)
-                                order = app.sell_order(quantity)
+                                order = sell_order(quantity)
                                 app.add_order(contract, order)
                                 tps.sleep(1)
                             else:
                                 print("OrderId is empty")
 
                     except Exception as e:
-                        print("Error:", e)
+                        pass
 
     current_minutes = datetime.now().minute
     if 30 <= current_minutes <= 59:
