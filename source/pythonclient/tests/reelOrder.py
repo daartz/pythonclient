@@ -6,6 +6,7 @@ from marketHours import *
 from placeOrder import *
 from send_mail import *
 
+
 # Current date in YYYY-MM-DD format
 today = datetime.now().date()
 
@@ -33,8 +34,8 @@ orders = ['buy','sell']
 for country in index:
     print(country)
 
-    # if opening_hours(country) == False:
-    #     continue
+    if opening_hours(country) == False:
+        continue
 
     for order in orders:
 

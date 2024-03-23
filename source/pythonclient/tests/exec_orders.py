@@ -5,11 +5,10 @@ from portfolio import *
 
 import threading
 
-port_list = [port_perso_test(), port_perso_prod(), port_pro_prod()]
-
+port_list = [port_perso_prod(), port_pro_prod()]
 
 index_pro = ['US9', 'ITALY','SPAIN','BELGIUM']
-index_perso = ['US IPO']
+index_perso = ['US9', 'ITALY','SPAIN','BELGIUM']
 index_test = ['GERMANY', 'FRANCE', 'US9', 'ITALY', 'SPAIN', 'BELGIUM', 'US IPO', "NDL"]
 
 def process_reel_order(port_code, index, sendMail = True):
@@ -33,7 +32,7 @@ for port in port_list:
 
 for port in port_list:
     if port == 4001:
-        open_order_thread = threading.Thread(target=process_reel_order, args=(port,index_pro, True,))
+        open_order_thread = threading.Thread(target=process_reel_order, args=(port,index_perso, True,))
         open_order_thread.start()
         threads.append(open_order_thread)
         pass
