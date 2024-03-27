@@ -158,7 +158,7 @@ def main_openOrder(port):
     # time.sleep(2)  # Wait for orders to be returned and processed
 
     # Send openOrders by mail
-    app.sendOpenOrders()
+    # app.sendOpenOrders()
     # time.sleep(0.5)
 
     app.disconnect()  # Disconnect when done

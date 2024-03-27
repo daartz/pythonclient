@@ -86,6 +86,7 @@ def process_orders(port, index_list, sendMail = True):
                 secType = "STK"
                 exchange = "SMART"
 
+                trailPercent = 4
                 valq = 0
                 if "US9" in country:
                     currency = "USD"
@@ -96,6 +97,7 @@ def process_orders(port, index_list, sendMail = True):
                 else:
                     currency = "EUR"
                     valq = 2000
+                    trailPercent = 3
 
                 order_type = row['ORDER']
                 quantity = valq // row['BUY']
@@ -116,9 +118,8 @@ def process_orders(port, index_list, sendMail = True):
                         if len(orderId_list) != 0:
                             continue
 
-                        trailPercent = 4
                         trailAmt = round(price * trailPercent / 100, 2)
-                        trailStopPrice = row['STOP']
+                        trailStopPrice = price - trailAmt
                         buyOrder = buy_order(quantity)
                         app.add_order(contract, buyOrder)
 
@@ -147,19 +148,32 @@ def process_orders(port, index_list, sendMail = True):
                                     tps.sleep(0.50)
 
                                 quantity = app.getPosition(stock)
+
                                 order = sell_order(quantity)
                                 app.add_order(contract, order)
                                 tps.sleep(1)
+
+                                # if closing_hours(country) == False :
+                                #
+                                #     trailPercent = 1.5
+                                #     trailAmt = round(price * trailPercent / 100, 2)
+                                #     trailStopPrice = price - trailAmt
+                                #     trail0rder = app.trailing_stop_order(quantity, trailStopPrice=trailStopPrice,
+                                #                                          trailAmt=trailAmt,
+                                #                                          trailPercent=trailPercent)
+                                #     app.add_order(contract, trail0rder)
+                                #     tps.sleep(1)
+
                             else:
                                 print("OrderId is empty")
 
                     except Exception as e:
                         pass
 
-    current_minutes = datetime.now().minute
-    if 30 <= current_minutes <= 59:
-        if sendMail:
-            app.sendOpenOrders()
+    # current_minutes = datetime.now().minute
+    # if 50 <= current_minutes <= 59:
+    #     if sendMail:
+    #         app.sendOpenOrders()
 
 
 

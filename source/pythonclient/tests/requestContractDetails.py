@@ -20,7 +20,7 @@ def main():
     app.connect("127.0.0.1", port(), 1000)
 
     mycontract = Contract()
-    mycontract.symbol = "AAPL"
+    mycontract.symbol = "META"
     mycontract.secType = "STK"
     mycontract.exchange = "SMART"
     mycontract.currency = "USD"

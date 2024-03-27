@@ -34,8 +34,8 @@ orders = ['buy','sell']
 for country in index:
     print(country)
 
-    if opening_hours(country) == False:
-        continue
+    # if opening_hours(country) == False:
+    #     continue
 
     for order in orders:
 
@@ -75,6 +75,7 @@ for country in index:
             secType = "STK"
             exchange = "SMART"
 
+            trailPercent = 4
             valq = 0
             if "US9" in country:
                 currency = "USD"
@@ -87,7 +88,8 @@ for country in index:
                 valq = 1000
             else:
                 currency = "EUR"
-                valq = 1000
+                valq = 2000
+                trailPercent = 3
 
             order_type = row['ORDER']
             quantity = valq // row['BUY']
@@ -107,9 +109,8 @@ for country in index:
                 if len(orderId_list) != 0:
                     continue
 
-                trailPercent = 4
                 trailAmt = round(price * trailPercent / 100, 2)
-                trailStopPrice = row['STOP']
+                trailStopPrice = price - trailAmt
                 order = buy_order(quantity)
                 app.add_order(contract, order)
 
