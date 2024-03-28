@@ -34,8 +34,8 @@ orders = ['buy','sell']
 for country in index:
     print(country)
 
-    # if opening_hours(country) == False:
-    #     continue
+    if opening_hours(country) == False:
+        continue
 
     for order in orders:
 
