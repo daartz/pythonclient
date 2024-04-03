@@ -1,6 +1,6 @@
 import csv
 import threading
-import time
+import time as tps
 from connection_port import *
 from ibapi.client import EClient
 from ibapi.contract import Contract
@@ -79,9 +79,9 @@ thread.start()
 
 for i in range(len(stock)):
     get_conid(client, stock[i], currency=devise[i])
-    time.sleep(0.1)
+    tps.sleep(0.1)
 
-time.sleep(5)  # Wait for all responses to come in
+tps.sleep(5)  # Wait for all responses to come in
 
 client.disconnect()
 thread.join()

@@ -12,7 +12,7 @@ today = datetime.now().date()
 
 # Connection details to IBKR
 HOST = '127.0.0.1'
-PORT = port()
+PORT = 7496
 CLIENT_ID = 1  # Unique for each connection
 
 index = ['GERMANY', 'FRANCE', 'US9', 'ITALY', 'SPAIN', 'BELGIUM', 'US IPO','AUSTRALIA']
@@ -33,9 +33,9 @@ orders = ['buy','sell']
 
 for country in index:
     print(country)
-
-    if opening_hours(country) == False:
-        continue
+    #
+    # if opening_hours(country) == False:
+    #     continue
 
     for order in orders:
 
