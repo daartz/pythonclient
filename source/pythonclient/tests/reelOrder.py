@@ -1,11 +1,8 @@
 import time as tps
 from threading import Thread
 
-from connection_port import *
-from marketHours import *
 from placeOrder import *
 from send_mail import *
-
 
 # Current date in YYYY-MM-DD format
 today = datetime.now().date()
@@ -15,7 +12,7 @@ HOST = '127.0.0.1'
 PORT = 7496
 CLIENT_ID = 1  # Unique for each connection
 
-index = ['GERMANY', 'FRANCE', 'US9', 'ITALY', 'SPAIN', 'BELGIUM', 'US IPO','AUSTRALIA']
+index = ['GERMANY', 'FRANCE', 'US9', 'ITALY', 'SPAIN', 'BELGIUM', 'US IPO', 'AUSTRALIA']
 index = ['US9']
 # Initialize the trading application
 app = TradingApp(PORT)
@@ -29,7 +26,7 @@ tps.sleep(3)
 
 data = pd.read_csv("C:\\TWS API\\source\\pythonclient\\tests\\Data\\positions.csv", index_col=0)
 
-orders = ['buy','sell']
+orders = ['buy', 'sell', 'hold']
 
 for country in index:
     print(country)
@@ -74,8 +71,9 @@ for country in index:
             stock = row['STOCK'].split('.')[0]
             secType = "STK"
             exchange = "SMART"
+            actual_percent = row['ACTUAL %']
 
-            trailPercent = 4
+            trailPercent = 3.5
             valq = 0
             if "US9" in country:
                 currency = "USD"
@@ -89,7 +87,7 @@ for country in index:
             else:
                 currency = "EUR"
                 valq = 2000
-                trailPercent = 3
+                trailPercent = 2.5
 
             order_type = row['ORDER']
             quantity = valq // row['BUY']
@@ -97,8 +95,8 @@ for country in index:
 
             contract = app.create_contract(stock, secType, exchange, currency)
 
-            if order_type == "BUY" :
-            # if order_type == "BUY" and closing_hours(country):
+            if order_type == "BUY":
+                # if order_type == "BUY" and closing_hours(country):
                 if app.find_position(stock):
                     continue
 
@@ -143,6 +141,34 @@ for country in index:
                             tps.sleep(2)
                         else:
                             print("OrderId is empty")
+
+                except Exception as e:
+                    print("Error:", e)
+
+            # elif order_type == "HOLD" and actual_percent > 2 :
+            #     try:
+            #         if app.find_position(stock):
+            #
+            #             app.reqOpenOrders()
+            #             tps.sleep(1)
+            #
+            #             orderId_list = app.orderId_present(stock, "SELL", currency=currency)
+            #
+            #             if len(orderId_list) != 0:
+            #                 for num in orderId_list:
+            #                     app.cancelOrder(num, manualCancelOrderTime=formatted_cancel_time)
+            #                     tps.sleep(0.30)
+            #
+            #                 quantity = data[stock]['Quantity']
+            #                 trailPercent = 2
+            #                 trailAmt = round(price * trailPercent / 100, 2)
+            #                 order = app.trailing_stop_order(quantity, trailStopPrice=row['SELL'], trailAmt=trailAmt,
+            #                                                 trailPercent=trailPercent)
+            #
+            #                 app.add_order(contract, order)
+            #                 tps.sleep(2)
+            #             else:
+            #                 print("OrderId is empty")
 
                 except Exception as e:
                     print("Error:", e)
