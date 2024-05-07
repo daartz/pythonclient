@@ -93,6 +93,9 @@ for country in index:
             quantity = valq // row['BUY']
             price = row['BUY']
 
+            if price < 2:
+                continue
+
             contract = app.create_contract(stock, secType, exchange, currency)
 
             if order_type == "BUY":

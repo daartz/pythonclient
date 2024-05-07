@@ -90,7 +90,7 @@ def process_orders(port, index_list, sendMail = True):
                 valq = 0
                 if "US9" in country:
                     currency = "USD"
-                    valq = 1000
+                    valq = 1500
                 elif "US" in country and country != "US9":
                     currency = "USD"
                     valq = 500
@@ -102,6 +102,10 @@ def process_orders(port, index_list, sendMail = True):
                 order_type = row['ORDER']
                 quantity = valq // row['BUY']
                 price = row['BUY']
+
+                # No penny stocks
+                if price < 2:
+                    continue
 
                 contract = app.create_contract(stock, secType, exchange, currency)
 
