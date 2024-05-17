@@ -94,6 +94,7 @@ class TestApp(EWrapper, EClient):
         self.porfolio["AverageCost"]= self.averagecost
         self.porfolio ["UnrealizedPNL"] = self.unrealizedPNL
         self.porfolio ["RealizedPNL"] = self.realizedPNL
+        
 
 
         try:
