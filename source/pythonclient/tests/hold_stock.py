@@ -14,6 +14,11 @@ country2 = []
 buy_date = []
 days = []
 url = []
+buy_price = []
+close = []
+actual_tx = []
+actual = []
+
 
 for country in index:
     print(country)
@@ -51,31 +56,62 @@ for country in index:
         buy_date.append(row['BUY DATE'])
         days.append((row['DAYS']))
         url.append(row['URL'])
+        buy_price.append(row['BUY'])
+        close.append(row['CLOSE'])
+        actual_tx.append(row['ACTUAL %'])
+        actual.append(row['ACTUAL_2000'])
 
-        hold_data = pd.DataFrame()
+        hold_data = pd.DataFrame({
+            "COUNTRY": country2,
+            "STOCK": hold_stock,
+            "BUY DATE": buy_date,
+            "BUY PRICE": buy_price,
+            "CLOSE": close,
+            "ACTUAL %": actual_tx,
+            "ACTUAL 2000": actual,
+            "DAYS": days,
+            "URL": url
+        })
 
-        hold_data["COUNTRY"] = country2
-        hold_data["STOCK"] = hold_stock
-        hold_data["BUY DATE"] = buy_date
-        hold_data["DAYS"] = days
-        hold_data["URL"] = url
-
-        print(hold_data)
+    print(hold_data)
 
 
-    port = ['4001','5001']
+ports = ['4001','5001']
 
-    for p in port:
+# Initialize columns for each port
+for p in ports:
+    hold_data[f'PORT_{p}'] = 'ABSENT'
 
-        file = f"C:\\TWS API\\source\\pythonclient\\tests\\Data\\portfolio_{p}.csv"
+# Update the hold_data DataFrame based on portfolio data
+for p in ports:
+    file = f"C:\\TWS API\\source\\pythonclient\\tests\\Data\\portfolio_{p}.csv"
 
-        # data = read_csv_with_encoding_and_delimiter_attempts(file)
-        data = pd.read_csv(file)
+    data = pd.read_csv(file)
 
-        for index, row in data.iterrows():
-            exist = row['Symbol']
+    for index, row in data.iterrows():
+        exist = row['Symbol']
 
-            if exist in hold_stock:
-                print("OK")
-            else:
-                print("KO")
+        if exist in hold_stock and row['UnrealizedPNL'] == '0.0':
+            hold_data.loc[hold_data['STOCK'] == exist, f'PORT_{p}'] = 'PRESENT'
+
+# Move the 'URL' column to the last position
+columns = hold_data.columns.tolist()
+columns.append(columns.pop(columns.index('URL')))
+hold_data = hold_data[columns]
+
+# Filter to keep only rows where at least one port has 'Absent'
+filter_condition = hold_data[[f'PORT_{p}' for p in ports]].eq('ABSENT').any(axis=1)
+filtered_hold_data = hold_data[filter_condition]
+
+# Sort the filtered_hold_data by 'BUY DATE' and then by 'STOCK'
+filtered_hold_data = filtered_hold_data.sort_values(by=['BUY DATE', 'STOCK'])
+
+# Save the filtered_hold_data to a CSV file
+output_csv_path = f'C:\\Users\\daart\\OneDrive\\PROREALTIME\\Signals\\filtered_hold_data_{today}.csv'
+filtered_hold_data.to_csv(output_csv_path, index=False)
+
+print(filtered_hold_data)
+print(f"hold_data saved to {output_csv_path}")
+
+html_data = '<p>Hold stock </p>' + filtered_hold_data.to_html()
+send_mail_html("IBKR Hold Stock ", html_data)
