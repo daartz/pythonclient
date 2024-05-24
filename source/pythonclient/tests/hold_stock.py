@@ -18,6 +18,8 @@ buy_price = []
 close = []
 actual_tx = []
 actual = []
+tx = []
+stop = []
 
 
 for country in index:
@@ -54,18 +56,22 @@ for country in index:
         hold_stock.append(stock)
         country2.append(country)
         buy_date.append(row['BUY DATE'])
+        tx.append(row['%'])
         days.append((row['DAYS']))
         url.append(row['URL'])
         buy_price.append(row['BUY'])
         close.append(row['CLOSE'])
         actual_tx.append(row['ACTUAL %'])
         actual.append(row['ACTUAL_2000'])
+        stop.append(row['STOP'])
 
         hold_data = pd.DataFrame({
             "COUNTRY": country2,
             "STOCK": hold_stock,
             "BUY DATE": buy_date,
             "BUY PRICE": buy_price,
+            "%": tx,
+            "STOP": stop,
             "CLOSE": close,
             "ACTUAL %": actual_tx,
             "ACTUAL 2000": actual,
@@ -89,7 +95,7 @@ for p in ports:
     data = pd.read_csv(file)
 
     for index, row in data.iterrows():
-        exist = row['Symbol']
+        exist = row['Symbol'].split('.')[0]
 
         if exist in hold_stock and row['UnrealizedPNL'] == '0.0':
             hold_data.loc[hold_data['STOCK'] == exist, f'PORT_{p}'] = 'PRESENT'

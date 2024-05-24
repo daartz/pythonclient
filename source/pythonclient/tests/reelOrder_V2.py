@@ -86,20 +86,20 @@ def process_orders(port, index_list, sendMail = True):
                 secType = "STK"
                 exchange = "SMART"
 
-                trailPercent = 3
+                trailPercent = 5
                 valq = 0
                 if "US9" in country:
                     currency = "USD"
-                    valq = 1500
-                    trailPercent = 3
+                    valq = 1000
+                    trailPercent = 5
                 elif "US" in country and country != "US9":
                     currency = "USD"
-                    valq = 500
-                    trailPercent = 4
+                    valq = 1000
+                    trailPercent = 5
                 else:
                     currency = "EUR"
-                    valq = 2000
-                    trailPercent = 2
+                    valq = 1500
+                    trailPercent = 5
 
                 order_type = row['ORDER']
                 quantity = valq // row['BUY']
