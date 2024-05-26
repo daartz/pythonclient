@@ -88,10 +88,10 @@ def closing_hours(x):
     if "US" in x:
         # Passage à l'heure d'été aux États-Unis (heure avancée)
         heure_debut = time(19, 30, 0)  # 20h00
-        heure_fin = time(21, 30, 0)  # 22h00
+        heure_fin = time(22, 30, 0)  # 22h00
     else:
         heure_debut = time(14, 30, 0)
-        heure_fin = time(16, 30, 0)
+        heure_fin = time(17, 30, 0)
 
     if heure_gmt.weekday() in [5, 6]:
         print(x)
@@ -120,10 +120,10 @@ def opening_hours(x):
     if "US" in x:
         # Passage à l'heure d'été aux États-Unis (heure avancée)
         heure_debut = time(13, 30, 0)
-        heure_fin = time(21, 30, 0)
+        heure_fin = time(22, 30, 0)
     else:
         heure_debut = time(7, 0, 0)
-        heure_fin = time(16, 30, 0)
+        heure_fin = time(17, 30, 0)
 
     if heure_gmt.weekday() in [5, 6]:
         print("Jour de fermeture des marchés")

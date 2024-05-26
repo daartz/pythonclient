@@ -102,7 +102,12 @@ def process_orders(port, index_list, sendMail = True):
                     trailPercent = 5
 
                 order_type = row['ORDER']
+
                 quantity = valq // row['BUY']
+
+                if quantity == 0:
+                    quantity = 1
+
                 price = row['BUY']
 
                 # No penny stocks
@@ -125,7 +130,7 @@ def process_orders(port, index_list, sendMail = True):
                             continue
 
                         trailAmt = round(price * trailPercent / 100, 2)
-                        trailStopPrice = price - trailAmt
+                        trailStopPrice =round(price - trailAmt,2)
                         buyOrder = buy_order(quantity)
                         app.add_order(contract, buyOrder)
 
