@@ -42,11 +42,11 @@ def process_orders(port, index_list, sendMail = True):
     for country in index:
         print(country)
 
-        # if opening_hours(country) == False:
-        #     continue
-        #
-        # if closing_hours(country) == False:
-        #     continue
+        if opening_hours(country) == False:
+            continue
+
+        if closing_hours(country) == False:
+            continue
 
         for order in orders:
 
@@ -90,16 +90,16 @@ def process_orders(port, index_list, sendMail = True):
                 valq = 0
                 if "US9" in country:
                     currency = "USD"
-                    valq = 1000
+                    valq = 750
                     trailPercent = 5
                 elif "US" in country and country != "US9":
                     currency = "USD"
-                    valq = 1000
+                    valq = 750
                     trailPercent = 5
                 else:
                     currency = "EUR"
                     valq = 1500
-                    trailPercent = 5
+                    trailPercent = 3
 
                 order_type = row['ORDER']
 

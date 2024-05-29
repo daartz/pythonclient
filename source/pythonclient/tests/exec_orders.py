@@ -7,7 +7,7 @@ import threading
 
 port_list = [port_perso_prod(), port_pro_prod()]
 
-index_pro = ['US9', 'ITALY','SPAIN','BELGIUM','GERMANY','NDL','EUROFRANCE']
+index_pro = ['US9', 'ITALY','SPAIN','BELGIUM','GERMANY','NDL','EUROFRANCE','US IPO']
 index_perso = ['US9', 'ITALY','SPAIN','BELGIUM']
 index_test = ['GERMANY', 'FRANCE', 'US9', 'ITALY', 'SPAIN', 'BELGIUM', 'US IPO', "NDL"]
 

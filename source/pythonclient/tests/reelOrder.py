@@ -73,20 +73,20 @@ for country in index:
             exchange = "SMART"
             # actual_percent = row['ACTUAL %']
 
-            trailPercent = 3.5
+            trailPercent = 4
             valq = 0
             if "US9" in country:
                 currency = "USD"
-                valq = 1000
+                valq = 750
             elif "US" in country and country != "US9":
                 currency = "USD"
-                valq = 1000
+                valq = 500
             elif "AUSTRALIA" in country:
                 currency = "AUD"
                 valq = 1000
             else:
                 currency = "EUR"
-                valq = 2000
+                valq = 1500
                 trailPercent = 2.5
 
             order_type = row['ORDER']
