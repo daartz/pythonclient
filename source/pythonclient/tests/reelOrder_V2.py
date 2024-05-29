@@ -42,11 +42,11 @@ def process_orders(port, index_list, sendMail = True):
     for country in index:
         print(country)
 
-        if opening_hours(country) == False:
-            continue
-
-        if closing_hours(country) == False:
-            continue
+        # if opening_hours(country) == False:
+        #     continue
+        #
+        # if closing_hours(country) == False:
+        #     continue
 
         for order in orders:
 
@@ -152,21 +152,21 @@ def process_orders(port, index_list, sendMail = True):
                             tps.sleep(1)
 
                             orderId_list = app.orderId_present(stock, "SELL", currency=currency)
+                            tps.sleep(0.3)
 
-                            if len(orderId_list) != 0:
-                                for num in orderId_list:
-                                    app.cancelOrder(num, manualCancelOrderTime=formatted_cancel_time)
-                                    tps.sleep(0.50)
+                            for num in orderId_list:
+                                app.cancelOrder(num, manualCancelOrderTime=formatted_cancel_time)
+                                tps.sleep(0.3)
 
-                                quantity = app.getPosition(stock)
+                            quantity = app.getPosition(stock)
+                            print("QUANTITY :" + str(quantity))
 
-                                order = sell_order(quantity)
-                                app.add_order(contract, order)
-                                tps.sleep(1)
+                            tps.sleep(0.3)
 
+                            order = sell_order(quantity)
+                            app.add_order(contract, order)
+                            tps.sleep(1)
 
-                            else:
-                                print("OrderId is empty")
 
                     except Exception as e:
                         pass

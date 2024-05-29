@@ -35,11 +35,12 @@ for port in port_list:
         open_order_thread = threading.Thread(target=process_reel_order, args=(port,index_pro, True,))
         open_order_thread.start()
         threads.append(open_order_thread)
-        pass
+
     elif port == 5001:
         open_order_thread = threading.Thread(target=process_reel_order, args=(port,index_pro, True,))
         open_order_thread.start()
         threads.append(open_order_thread)
+
     else:
         open_order_thread = threading.Thread(target=process_reel_order, args=(port, index_test, True,))
         open_order_thread.start()

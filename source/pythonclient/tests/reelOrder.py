@@ -9,7 +9,7 @@ today = datetime.now().date()
 
 # Connection details to IBKR
 HOST = '127.0.0.1'
-PORT = 7496
+PORT = 4001
 CLIENT_ID = 1  # Unique for each connection
 
 index = ['GERMANY', 'FRANCE', 'US9', 'ITALY', 'SPAIN', 'BELGIUM', 'US IPO', 'AUSTRALIA']
@@ -71,7 +71,7 @@ for country in index:
             stock = row['STOCK'].split('.')[0]
             secType = "STK"
             exchange = "SMART"
-            actual_percent = row['ACTUAL %']
+            # actual_percent = row['ACTUAL %']
 
             trailPercent = 3.5
             valq = 0
