@@ -27,7 +27,7 @@ def process_orders(port, index_list, sendMail = True):
 
     tps.sleep(2)
     app.reqOpenOrders()
-    tps.sleep(5)
+    tps.sleep(10)
     app.all_orderId()
     tps.sleep(5)
 
@@ -148,34 +148,30 @@ def process_orders(port, index_list, sendMail = True):
                     try:
                         if app.find_position(stock):
 
-                            app.reqOpenOrders()
-                            tps.sleep(1)
-
                             orderId_list = app.orderId_present(stock, "SELL", currency=currency)
-                            tps.sleep(0.3)
 
-                            for num in orderId_list:
-                                app.cancelOrder(num, manualCancelOrderTime=formatted_cancel_time)
-                                tps.sleep(0.3)
+                            if len(orderId_list) != 0:
+                                for num in orderId_list:
+                                    app.cancelOrder(num, manualCancelOrderTime=formatted_cancel_time)
+                                    tps.sleep(0.30)
 
-                            quantity = app.getPosition(stock)
-                            print("QUANTITY :" + str(quantity))
+                            else:
+                                print("OrderId is empty")
 
-                            tps.sleep(0.3)
-
-                            order = sell_order(quantity)
+                            quantity = data[stock]['Quantity']
+                            trailPercent = 0.00
+                            trailAmt = round(price * trailPercent / 100, 2)
+                            trailStopPrice = price - trailAmt
+                            order = app.trailing_stop_order(quantity, trailStopPrice=trailStopPrice, trailAmt=trailAmt,
+                                                            trailPercent=trailPercent)
+                            # order = app.sell_order(quantity)
                             app.add_order(contract, order)
                             tps.sleep(1)
 
 
+
                     except Exception as e:
                         pass
-
-    # current_minutes = datetime.now().minute
-    # if 50 <= current_minutes <= 59:
-    #     if sendMail:
-    #         app.sendOpenOrders()
-
 
 
     # Disconnect after processing all files
@@ -195,5 +191,5 @@ def process_orders(port, index_list, sendMail = True):
 
 # if __name__ == "__main__":
 #
-#     process_orders(port(), index_test(), True)
+#     process_orders(port_pro_prod(), index_pro(), True)
 #     sys.exit()
