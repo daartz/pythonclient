@@ -37,16 +37,16 @@ def process_orders(port, index_list, sendMail = True):
 
     index = index_list
 
-    orders = ['buy','sell']
+    orders = ['sell']
 
     for country in index:
         print(country)
 
-        if opening_hours(country) == False:
-            continue
-
-        if closing_hours(country) == False:
-            continue
+        # if opening_hours(country) == False:
+        #     continue
+        #
+        # if closing_hours(country) == False:
+        #     continue
 
         for order in orders:
 
@@ -116,35 +116,7 @@ def process_orders(port, index_list, sendMail = True):
 
                 contract = app.create_contract(stock, secType, exchange, currency)
 
-                # if order_type == "BUY" and closing_hours(country):
-                if order_type == "BUY" :
-                    try:
-                        if app.find_position(stock):
-                            continue
-
-                        tps.sleep(1)
-
-                        orderId_list = app.orderId_present(stock, "BUY", currency=currency)
-
-                        if len(orderId_list) != 0:
-                            continue
-
-                        trailAmt = round(price * trailPercent / 100, 2)
-                        trailStopPrice =round(price - trailAmt,2)
-                        buyOrder = buy_order(quantity)
-                        app.add_order(contract, buyOrder)
-
-                        tps.sleep(0.5)
-
-                        trail0rder = app.trailing_stop_order(quantity, trailStopPrice=trailStopPrice, trailAmt=trailAmt,
-                                                    trailPercent=trailPercent)
-                        app.add_order(contract, trail0rder)
-                        tps.sleep(1)
-
-                    except:
-                        pass
-
-                elif order_type == "SELL":
+                if order_type == "SELL":
                     try:
                         if app.find_position(stock):
 
@@ -172,7 +144,6 @@ def process_orders(port, index_list, sendMail = True):
                     except Exception as e:
                         pass
 
-
     # Disconnect after processing all files
     try:
         app.run()
@@ -187,8 +158,8 @@ def process_orders(port, index_list, sendMail = True):
         # app.connect('127.0.0.1', '8000', '22')
         return False
 
+if __name__ == "__main__":
 
-# if __name__ == "__main__":
-#
-#     process_orders(port_pro_prod(), index_pro(), True)
-#     sys.exit()
+    indice = ['US9', 'ITALY','SPAIN','BELGIUM','GERMANY','NDL','EUROFRANCE','US IPO']
+    process_orders(port_pro_prod(), indice, True)
+    sys.exit()
