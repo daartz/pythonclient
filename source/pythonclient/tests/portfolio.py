@@ -1,35 +1,30 @@
-import pandas as pd
-
-import sys
-from send_mail import *
-
-from ibapi.client import EClient
-from ibapi.wrapper import EWrapper
-from ibapi.contract import Contract
 from threading import Timer
 
-from connection_port import *
+from ibapi.client import EClient
+from ibapi.contract import Contract
+from ibapi.wrapper import EWrapper
+from send_mail import *
 
 
 class TestApp(EWrapper, EClient):
-    def __init__(self, send_email = False):
+    def __init__(self, send_email=False):
         EClient.__init__(self, self)
-        self.portfolio ={}
+        self.portfolio = {}
         self.accountName = []
-        self.symbol =[]
+        self.symbol = []
         self.sectype = []
-        self.exchange =[]
-        self.position =[]
+        self.exchange = []
+        self.position = []
         self.marketprice = []
-        self.marketvalue =[]
+        self.marketvalue = []
         self.averagecost = []
         self.unrealizedPNL = []
         self.realizedPNL = []
         self.account = ""
         self.accountvalue = {}
         self.key = []
-        self.val =[]
-        self.currency =[]
+        self.val = []
+        self.currency = []
         self.accountname2 = []
         self.port_code = None  # New attribute to store the port code
         self.send_email = send_email
@@ -51,12 +46,11 @@ class TestApp(EWrapper, EClient):
         self.sectype.append(contract.secType)
         self.exchange.append(contract.exchange)
         self.position.append(position)
-        self.marketprice.append(round(marketPrice,2))
-        self.marketvalue.append(round(marketValue,2))
-        self.averagecost.append(round(averageCost,2))
-        self.unrealizedPNL.append(round(unrealizedPNL,2))
-        self.realizedPNL.append(round(realizedPNL,2))
-
+        self.marketprice.append(round(marketPrice, 2))
+        self.marketvalue.append(round(marketValue, 2))
+        self.averagecost.append(round(averageCost, 2))
+        self.unrealizedPNL.append(round(unrealizedPNL, 2))
+        self.realizedPNL.append(round(realizedPNL, 2))
 
     def updateAccountValue(self, key: str, val: str, currency: str, accountName: str):
         # print("UpdateAccountValue. Key:", key, "Value:", val, "Currency:", currency, "AccountName:", accountName)
@@ -85,30 +79,30 @@ class TestApp(EWrapper, EClient):
 
         self.porfolio = {}
         # self.porfolio["AccountName"] = self.accountName
-        self.porfolio["Symbol"]=  self.symbol
+        self.porfolio["Symbol"] = self.symbol
         self.porfolio["SecType"] = self.sectype
-        self.porfolio["Exchange"]= self.exchange
+        self.porfolio["Exchange"] = self.exchange
         self.porfolio["Position"] = self.position
         self.porfolio["MarketPrice"] = self.marketprice
         self.porfolio["MarketValue"] = self.marketvalue
-        self.porfolio["AverageCost"]= self.averagecost
-        self.porfolio ["UnrealizedPNL"] = self.unrealizedPNL
-        self.porfolio ["RealizedPNL"] = self.realizedPNL
-        
-
+        self.porfolio["AverageCost"] = self.averagecost
+        self.porfolio["UnrealizedPNL"] = self.unrealizedPNL
+        self.porfolio["RealizedPNL"] = self.realizedPNL
 
         try:
             data = pd.DataFrame(self.porfolio)
             nb = data["Symbol"].count()
-            unrpnl = round(data["UnrealizedPNL"].sum(),2)
-            rpnl = round(data["RealizedPNL"].sum(),2)
+            mktValue = round(data["MarketValue"].sum(), 2)
+            unrpnl = round(data["UnrealizedPNL"].sum(), 2)
+            rpnl = round(data["RealizedPNL"].sum(), 2)
 
-            data.to_csv(portfolio_file, index = False)
+            data.to_csv(portfolio_file, index=False)
 
             if self.send_email:
-
-                html_data = '<p>(TWS) Portfolio : '+ self.accountName[0]+' </p><p>Nb of Stocks : '+ str(nb)+ '</p><p>Unrealized PNL : '+\
-                            str(unrpnl)+'</p><p>Realized PNL : '+ str(rpnl)+'</p>'+ data.to_html()
+                html_data = '<p>(TWS) Portfolio : ' + self.accountName[0] + ' </p><p>Nb of Stocks : ' + str(nb) \
+                            + ' </p><p>Market Value : ' + str(mktValue) \
+                            + '</p><p>Unrealized PNL : ' + \
+                            str(unrpnl) + '</p><p>Realized PNL : ' + str(rpnl) + '</p>' + data.to_html()
                 send_mail_html("IBKR TWS Portfolio " + self.accountName[0], html_data)
 
         except:
@@ -127,19 +121,17 @@ class TestApp(EWrapper, EClient):
             # self.accountvalue['AccountName']= self.accountname2
 
             data = pd.DataFrame(self.accountvalue)
-            data.to_csv(account_value_file, index = False)
+            data.to_csv(account_value_file, index=False)
 
             if self.send_email:
-
-                html_data = '<p>(TWS) Account Value : ' + self.accountname2[0] +'</p>' + data.to_html()
-                send_mail_html("IBKR TWS Account Value " + self.accountname2[0] , html_data)
+                html_data = '<p>(TWS) Account Value : ' + self.accountname2[0] + '</p>' + data.to_html()
+                send_mail_html("IBKR TWS Account Value " + self.accountname2[0], html_data)
 
         except:
             if self.send_email:
                 send_mail("IBKR TWS Account Value " + str(self.port_code), "No Account data to send")
             else:
                 pass
-
 
     def start(self):
         # Account number can be omitted when using reqAccountUpdates with single account structure
@@ -148,13 +140,13 @@ class TestApp(EWrapper, EClient):
         # self.port_code = f"{self.host}_{self.port}"
         self.port_code = f"{self.port}"
 
-
     def stop(self):
         self.reqAccountUpdates(False, "")
         self.done = True
         self.disconnect()
 
-def main_portfolio(port, send_email = False):
+
+def main_portfolio(port, send_email=False):
     app = TestApp(send_email)
     app.connect("127.0.0.1", port, 0)
 

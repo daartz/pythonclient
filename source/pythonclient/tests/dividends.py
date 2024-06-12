@@ -33,7 +33,7 @@ if __name__ == "__main__":
     app = IBKRApp()
 
     # Connect to TWS or IB Gateway running on localhost with port 7497
-    app.connect("127.0.0.1", 4002, clientId=0)
+    app.connect("127.0.0.1", 4001, clientId=0)
 
     # Start the socket in a thread
     api_thread = threading.Thread(target=run_loop, daemon=True)

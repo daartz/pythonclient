@@ -5,11 +5,6 @@ import time
 from datetime import datetime, timedelta
 import csv
 from send_mail import *
-import pandas as pd
-from ibapi.client import EClient
-from ibapi.contract import Contract
-from ibapi.order import Order
-from ibapi.wrapper import EWrapper
 
 def install_package(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
@@ -58,6 +53,20 @@ def buy_order(quantity):
     # order.outsideRth = True
 
     print("Buy Order created : " + order.orderType + " - Qty : " + str(order.totalQuantity) + " - " + order.action)
+    return order
+
+def stop_order(quantity, StopPrice):
+
+    order = Order()
+    order.action = "SELL"
+    order.orderType = "STP"
+    order.auxPrice = StopPrice
+    order.totalQuantity = quantity
+    order.eTradeOnly = False
+    order.firmQuoteOnly = False
+    order.transmit = True
+
+    print("Stop Order created : " + order.orderType + " - Qty : " + str(order.totalQuantity) + " - " + order.action)
     return order
 
 def sell_order(quantity):

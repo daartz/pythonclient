@@ -12,8 +12,8 @@ HOST = '127.0.0.1'
 PORT = 5001
 CLIENT_ID = 1  # Unique for each connection
 
-index = ['GERMANY', 'FRANCE', 'US9', 'ITALY', 'SPAIN', 'BELGIUM', 'US IPO', 'AUSTRALIA']
-index = ['US9']
+index = ['GERMANY', 'FRANCE', 'US9', 'ITALY', 'SPAIN', 'BELGIUM', 'US IPO', 'CANADA','NDL']
+# index = ['US9']
 # Initialize the trading application
 app = TradingApp(PORT)
 app.connect(HOST, PORT, CLIENT_ID)
@@ -73,21 +73,21 @@ for country in index:
             exchange = "SMART"
             # actual_percent = row['ACTUAL %']
 
-            trailPercent = 4
+            trailPercent = 5
             valq = 0
             if "US9" in country:
                 currency = "USD"
-                valq = 750
+                valq = 600
             elif "US" in country and country != "US9":
                 currency = "USD"
-                valq = 500
+                valq = 600
             elif "AUSTRALIA" in country:
                 currency = "AUD"
                 valq = 1000
             else:
                 currency = "EUR"
                 valq = 1500
-                trailPercent = 2.5
+                trailPercent = 4
 
             order_type = row['ORDER']
             quantity = valq // row['BUY']
@@ -115,8 +115,8 @@ for country in index:
                 order = buy_order(quantity)
                 app.add_order(contract, order)
 
-                order = app.trailing_stop_order(quantity, trailStopPrice=trailStopPrice, trailAmt=trailAmt,
-                                                trailPercent=trailPercent)
+                trailStopPrice = price - trailAmt
+                order = stop_order(quantity, StopPrice=round(trailStopPrice, 2))
                 app.add_order(contract, order)
                 tps.sleep(2)
 

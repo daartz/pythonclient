@@ -88,18 +88,14 @@ def process_orders(port, index_list, sendMail = True):
 
                 trailPercent = 5
                 valq = 0
-                if "US9" in country:
+                if "US" in country:
                     currency = "USD"
-                    valq = 750
-                    trailPercent = 5
-                elif "US" in country and country != "US9":
-                    currency = "USD"
-                    valq = 750
+                    valq = 600
                     trailPercent = 5
                 else:
                     currency = "EUR"
                     valq = 1500
-                    trailPercent = 3
+                    trailPercent = 5
 
                 order_type = row['ORDER']
 
@@ -130,16 +126,13 @@ def process_orders(port, index_list, sendMail = True):
                             continue
 
                         trailAmt = round(price * trailPercent / 100, 2)
-                        trailStopPrice =round(price - trailAmt,2)
-                        buyOrder = buy_order(quantity)
-                        app.add_order(contract, buyOrder)
+                        trailStopPrice = price - trailAmt
+                        order = buy_order(quantity)
+                        app.add_order(contract, order)
 
-                        tps.sleep(0.5)
-
-                        trail0rder = app.trailing_stop_order(quantity, trailStopPrice=trailStopPrice, trailAmt=trailAmt,
-                                                    trailPercent=trailPercent)
-                        app.add_order(contract, trail0rder)
-                        tps.sleep(1)
+                        order = stop_order(quantity, StopPrice=round(trailStopPrice, 2))
+                        app.add_order(contract, order)
+                        tps.sleep(2)
 
                     except:
                         pass
@@ -159,13 +152,13 @@ def process_orders(port, index_list, sendMail = True):
                                 print("OrderId is empty")
 
                             quantity = app.getPosition(stock)
-                            trailPercent = 0.05
-                            trailAmt = round(price * trailPercent / 100, 2)
-                            trailStopPrice = price - trailAmt
-                            order = app.trailing_stop_order(quantity, trailStopPrice=trailStopPrice, trailAmt=trailAmt,
-                                                            trailPercent=trailPercent)
+                            # trailPercent = 0.05
+                            # trailAmt = round(price * trailPercent / 100, 2)
+                            # trailStopPrice = round(price - trailAmt,2)
+                            # order = app.trailing_stop_order(quantity, trailStopPrice=trailStopPrice, trailAmt=trailAmt,
+                            #                                 trailPercent=trailPercent)
                             tps.sleep(1)
-                            # order = app.sell_order(quantity)
+                            order = app.sell_order(quantity)
                             app.add_order(contract, order)
                             tps.sleep(1)
 

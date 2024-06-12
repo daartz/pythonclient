@@ -162,7 +162,7 @@ def main_openOrder(port):
     # time.sleep(0.5)
 
     app.disconnect()  # Disconnect when done
-
-if __name__ == "__main__":
-    port_code = 5001  # Assuming port() function returns your port code
-    main_openOrder(port_code)
+#
+# if __name__ == "__main__":
+#     port_code = 5001  # Assuming port() function returns your port code
+#     main_openOrder(port_code)

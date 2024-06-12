@@ -131,13 +131,12 @@ def process_orders(port, index_list, sendMail = True):
                                 print("OrderId is empty")
 
                             quantity = app.getPosition(stock)
-                            trailPercent = 0.05
+                            trailPercent =trailPercent
                             trailAmt = round(price * trailPercent / 100, 2)
                             trailStopPrice = price - trailAmt
-                            order = app.trailing_stop_order(quantity, trailStopPrice=trailStopPrice, trailAmt=trailAmt,
-                                                            trailPercent=trailPercent)
+                            order = app.stop_order(quantity, trailStopPrice=round(trailStopPrice,2))
                             tps.sleep(1)
-                            # order = app.sell_order(quantity)
+
                             app.add_order(contract, order)
                             tps.sleep(1)
 
