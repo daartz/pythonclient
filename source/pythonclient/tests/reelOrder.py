@@ -12,7 +12,7 @@ HOST = '127.0.0.1'
 PORT = 5001
 CLIENT_ID = 1  # Unique for each connection
 
-index = ['GERMANY', 'FRANCE', 'US9', 'ITALY', 'SPAIN', 'BELGIUM', 'US IPO', 'CANADA','NDL']
+index = ['US9', 'US9A', 'US9B', 'CANADA', 'ITALY','SPAIN','BELGIUM','GERMANY','NDL','FRANCE','EUROFRANCE','US IPO']
 # index = ['US9']
 # Initialize the trading application
 app = TradingApp(PORT)
