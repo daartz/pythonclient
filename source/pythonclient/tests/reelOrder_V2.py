@@ -1,17 +1,11 @@
-import os
-import threading
-import time
-
-import pandas as pd
-from datetime import datetime
 import time as tps
+
+from marketHours import *
 from placeOrder import *
 from portfolio import *
-import sys
-from connection_port import *
-from marketHours import *
 
-def process_orders(port, index_list, sendMail = True):
+
+def process_orders(port, index_list, sendMail=True):
     # Current date in YYYY-MM-DD format
     today = datetime.now().date()
 
@@ -37,16 +31,17 @@ def process_orders(port, index_list, sendMail = True):
 
     index = index_list
 
-    orders = ['buy','sell']
+    orders = ['buy', 'sell']
 
     for country in index:
         print(country)
 
-        if opening_hours(country) == False:
-            continue
-
-        if closing_hours(country) == False:
-            continue
+        # if country not in ["USX", "EUROX"]:
+        #     if opening_hours(country) == False:
+        #         continue
+        #
+        #     if closing_hours(country) == False:
+        #         continue
 
         for order in orders:
 
@@ -78,7 +73,8 @@ def process_orders(port, index_list, sendMail = True):
                     continue
 
                 print('-------------------------------------------------------------------')
-                print("("+ str(port) +') ****   ' + row['STOCK'] + ' - ' + row['NAME'] + ' - ' + row['ORDER'] + ' - ' + str(
+                print("(" + str(port) + ') ****   ' + row['STOCK'] + ' - ' + row['NAME'] + ' - ' + row[
+                    'ORDER'] + ' - ' + str(
                     row['BUY']) + ' - ' + str(
                     row['DATE']) + '   ****')
 
@@ -91,7 +87,11 @@ def process_orders(port, index_list, sendMail = True):
                 if "US" in country:
                     currency = "USD"
                     valq = 600
-                    trailPercent = 5
+                    trailPercent = 6
+                elif "CANADA" in country:
+                    currency = "CAD"
+                    valq = 600
+                    trailPercent = 6
                 else:
                     currency = "EUR"
                     valq = 1500
@@ -112,8 +112,7 @@ def process_orders(port, index_list, sendMail = True):
 
                 contract = app.create_contract(stock, secType, exchange, currency)
 
-                # if order_type == "BUY" and closing_hours(country):
-                if order_type == "BUY" :
+                if order_type == "BUY":
                     try:
                         if app.find_position(stock):
                             continue
@@ -125,12 +124,24 @@ def process_orders(port, index_list, sendMail = True):
                         if len(orderId_list) != 0:
                             continue
 
-                        trailAmt = round(price * trailPercent / 100, 2)
-                        trailStopPrice = price - trailAmt
                         order = buy_order(quantity)
                         app.add_order(contract, order)
 
-                        order = stop_order(quantity, StopPrice=round(trailStopPrice, 2))
+                        trailAmt = round(price * trailPercent / 100, 2)
+                        trailStopPrice = round(price - trailAmt, 2)
+
+                        # Pour US et CANADA, stop price de -5%
+                        # Pour Europe, trailing stop de 4%
+
+                        if "US" in country or "CANADA" in country:
+
+                            order = stop_order(quantity, StopPrice=round(trailStopPrice, 2))
+
+                        else:
+
+                            order = app.trailing_stop_order(quantity, trailStopPrice=trailStopPrice, trailAmt=trailAmt,
+                                                            trailPercent=trailPercent)
+
                         app.add_order(contract, order)
                         tps.sleep(2)
 
@@ -165,7 +176,6 @@ def process_orders(port, index_list, sendMail = True):
                     except Exception as e:
                         pass
 
-
     # Disconnect after processing all files
     try:
         app.run()
@@ -179,7 +189,6 @@ def process_orders(port, index_list, sendMail = True):
         app.disconnect()
         # app.connect('127.0.0.1', '8000', '22')
         return False
-
 
 # if __name__ == "__main__":
 #

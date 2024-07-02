@@ -42,33 +42,61 @@ def get_conid(client, symbol, sec_type="STK", currency="USD", exchange="SMART"):
 
 
 client = TWSClient()
-client.connect("127.0.0.1", port(), 1)
+client.connect("127.0.0.1", 5001, 1)
 
 # Starting the client on a separate thread
 
 tps.sleep(1)  # Give it a moment to establish the connection
 
-indices = ["FRANCE", "BELGIUM", "ITALY", "US9","US8", "GERMANY", "SPAIN", "UK","US IPO1","US IPO2","US5","US6","US7"]
+indices = ["FRANCE", "BELGIUM", "ITALY", "US9A","US9B", "GERMANY", "SPAIN", "NDL","CANADA","AUSTRALIA"]
+indices = ["AUSTRALIA"]
 
 file = "C:\\Users\\daart\\OneDrive\\PROREALTIME\\Stocks list V2.csv"
-file = "C:\\Users\\daart\\OneDrive\\PROREALTIME\\STOCK IPO US.csv"
+# file = "C:\\Users\\daart\\OneDrive\\PROREALTIME\\STOCK IPO US.csv"
 
 dict = {}
 market = []
 stock = []
 devise = []
 
+file = "C:\\Users\\daart\\OneDrive\\PROREALTIME\\Stocks list V2.csv"
+
+
 with open(file, "r", encoding='latin-1') as f:
-    reader = csv.reader(f, delimiter=",")
+    reader = csv.reader(f, delimiter=";")
     for i in reader:
-        # if i[3] in indices:
-            # if "US" in i[3]:
-            #     devise.append("USD")
-            # else:
-            #     devise.append("EUR")
-        devise.append("USD")
-        market.append("US")
-        stock.append(i[1])
+        if i[3] in indices:
+            if "US" in i[3]:
+                devise.append("USD")
+                market.append("US")
+            elif "CANADA" in i[3]:
+                devise.append("CAD")
+                market.append("CANADA")
+            elif "AUSTRALIA" in i[3]:
+                devise.append("AUS")
+                market.append("AUTRALIA")
+            elif "FRANCE" in i[3]:
+                devise.append("EUR")
+                market.append("FRANCE")
+            elif "NDL" in i[3]:
+                devise.append("EUR")
+                market.append("NDL")
+            elif "GERMANY" in i[3]:
+                devise.append("EUR")
+                market.append("GERMANY")
+            elif "SPAIN" in i[3]:
+                devise.append("EUR")
+                market.append("SPAIN")
+            elif "ITALY" in i[3]:
+                devise.append("EUR")
+                market.append("ITALY")
+            elif "EUROFRANCE" in i[3]:
+                devise.append("EUR")
+                market.append("EUROFRANCE")
+            else:
+                devise.append("EUR")
+                market.append("EUROPE")
+            stock.append(i[6])
 
 dict['MARKET'] = market
 dict['STOCK'] = stock
@@ -79,7 +107,7 @@ thread.start()
 
 for i in range(len(stock)):
     get_conid(client, stock[i], currency=devise[i])
-    tps.sleep(0.1)
+    tps.sleep(0.2)
 
 tps.sleep(5)  # Wait for all responses to come in
 
@@ -89,7 +117,7 @@ print(client.contract_details.items())
 
 
 # Écriture dans un fichier CSV
-with open('contract_details IPO.csv', 'w', newline='') as file:
+with open('contract_details GLOBAL.csv', 'w', newline='') as file:
     writer = csv.writer(file)
     writer.writerow(['Symbol', 'Currency', 'conId'])
     for req_id, details in client.contract_details.items():

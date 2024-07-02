@@ -5,9 +5,11 @@ from portfolio import *
 
 import threading
 
+from connection_port import port_pro_prod, port_perso_prod
+
 port_list = [port_perso_prod(), port_pro_prod()]
 
-index_pro = ['US9', 'US9A', 'US9B', 'CANADA', 'ITALY','SPAIN','BELGIUM','GERMANY','NDL','FRANCE','EUROFRANCE','US IPO']
+index_pro = ['USX','EUROX','US9', 'US9A', 'US9B', 'CANADA', 'ITALY','SPAIN','BELGIUM','GERMANY','NDL','FRANCE','EUROFRANCE','US IPO']
 index_perso = ['US9', 'ITALY','SPAIN','BELGIUM']
 index_test = ['GERMANY', 'FRANCE', 'US9', 'ITALY', 'SPAIN', 'BELGIUM', 'US IPO', "NDL"]
 

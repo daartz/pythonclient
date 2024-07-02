@@ -111,11 +111,10 @@ for country in index:
                     continue
 
                 trailAmt = round(price * trailPercent / 100, 2)
-                trailStopPrice = price - trailAmt
+                trailStopPrice = round(price - trailAmt,2)
                 order = buy_order(quantity)
                 app.add_order(contract, order)
 
-                trailStopPrice = price - trailAmt
                 order = stop_order(quantity, StopPrice=round(trailStopPrice, 2))
                 app.add_order(contract, order)
                 tps.sleep(2)
