@@ -4,6 +4,15 @@ from marketHours import *
 from placeOrder import *
 from portfolio import *
 
+def ibkr_stock_name(stock):
+    x = ""
+    if stock == "AMP.MI":
+        x = "AMP2.MI"
+    elif stock == "RED.MC":
+        x = "RED1.MC"
+    else:
+        x = stock
+    return x
 
 def process_orders(port, index_list, sendMail=True):
     # Current date in YYYY-MM-DD format
