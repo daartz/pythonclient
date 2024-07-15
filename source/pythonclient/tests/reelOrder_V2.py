@@ -4,15 +4,23 @@ from marketHours import *
 from placeOrder import *
 from portfolio import *
 
+
 def ibkr_stock_name(stock):
     x = ""
     if stock == "AMP.MI":
         x = "AMP2.MI"
     elif stock == "RED.MC":
         x = "RED1.MC"
+    elif stock == "UNI.MC":
+        x = "UNI1.MC"
+    elif stock == "SAB.MC":
+        x = "SAB1.MC"
+    elif stock == "DBG.PA":
+        x = "DBG1.PA"
     else:
         x = stock
     return x
+
 
 def process_orders(port, index_list, sendMail=True):
     # Current date in YYYY-MM-DD format
@@ -76,6 +84,14 @@ def process_orders(port, index_list, sendMail=True):
 
             # Process orders
             for index, row in df_today.iterrows():
+
+                try:
+                    if "IPO" in country:
+                        if row["CONF"] != "OK":
+                            continue
+                except:
+                    pass
+
                 date = row['DATE'].strftime("%Y-%m-%d")
 
                 if date != str(today):
@@ -95,15 +111,16 @@ def process_orders(port, index_list, sendMail=True):
                 valq = 0
                 if "US" in country:
                     currency = "USD"
-                    valq = 600
+                    valq = 750
                     trailPercent = 6
+
                 elif "CANADA" in country:
                     currency = "CAD"
-                    valq = 600
+                    valq = 750
                     trailPercent = 6
                 else:
                     currency = "EUR"
-                    valq = 1500
+                    valq = 1200
                     trailPercent = 5
 
                 order_type = row['ORDER']
@@ -116,8 +133,12 @@ def process_orders(port, index_list, sendMail=True):
                 price = row['BUY']
 
                 # No penny stocks
-                if price < 1:
-                    continue
+                if "US" in country:
+                    if price < 2:
+                        continue
+                else:
+                    if price < 1:
+                        continue
 
                 contract = app.create_contract(stock, secType, exchange, currency)
 
