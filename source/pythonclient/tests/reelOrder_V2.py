@@ -19,6 +19,9 @@ def ibkr_stock_name(stock):
         x = "DBG1.PA"
     else:
         x = stock
+
+    x = x.replace("-", ".")
+
     return x
 
 
@@ -53,12 +56,12 @@ def process_orders(port, index_list, sendMail=True):
     for country in index:
         print(country)
 
-        if country not in ["USX", "EUROX"]:
-            if opening_hours(country) == False:
-                continue
+        # if country not in ["USX", "EUROX"]:
+        if opening_hours(country) == False:
+            continue
 
-            if closing_hours(country) == False:
-                continue
+        if closing_hours(country) == False:
+            continue
 
         for order in orders:
 
@@ -85,12 +88,12 @@ def process_orders(port, index_list, sendMail=True):
             # Process orders
             for index, row in df_today.iterrows():
 
-                try:
-                    if "IPO" in country:
-                        if row["CONF"] != "OK":
-                            continue
-                except:
-                    pass
+                # try:
+                #     if "IPO" in country:
+                #         if row["CONF"] != "OK":
+                #             continue
+                # except:
+                #     pass
 
                 date = row['DATE'].strftime("%Y-%m-%d")
 
@@ -111,12 +114,12 @@ def process_orders(port, index_list, sendMail=True):
                 valq = 0
                 if "US" in country:
                     currency = "USD"
-                    valq = 750
+                    valq = 700
                     trailPercent = 6
 
                 elif "CANADA" in country:
                     currency = "CAD"
-                    valq = 750
+                    valq = 700
                     trailPercent = 6
                 else:
                     currency = "EUR"
@@ -127,8 +130,8 @@ def process_orders(port, index_list, sendMail=True):
 
                 quantity = valq // row['BUY']
 
-                if quantity == 0:
-                    quantity = 1
+                # if quantity == 0:
+                #     quantity = 1
 
                 price = row['BUY']
 
