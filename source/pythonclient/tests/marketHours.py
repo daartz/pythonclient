@@ -85,7 +85,7 @@ def closing_hours(x):
     heure_gmt = datetime.now(timezone.utc)
     closing = False
     # Définissez les heures de début et de fin (17h00 et 17h30)
-    if "US" in x:
+    if "US" in x or "CANADA" in x:
         # Passage à l'heure d'été aux États-Unis (heure avancée)
         heure_debut = time(19, 30, 0)  # 20h00
         heure_fin = time(22, 30, 0)  # 22h00
@@ -117,7 +117,7 @@ def opening_hours(x):
     heure_gmt = datetime.now(timezone.utc)
     opening = False
 
-    if "US" in x:
+    if "US" in x or "CANADA" in x:
         # Passage à l'heure d'été aux États-Unis (heure avancée)
         heure_debut = time(13, 30, 0)
         heure_fin = time(22, 30, 0)

@@ -20,8 +20,6 @@ def ibkr_stock_name(stock):
     else:
         x = stock
 
-    x = x.replace("-", ".")
-
     return x
 
 
@@ -41,7 +39,7 @@ def process_orders(port, index_list, sendMail=True):
 
     tps.sleep(2)
     app.reqOpenOrders()
-    tps.sleep(10)
+    tps.sleep(8)
     app.all_orderId()
     tps.sleep(5)
 
@@ -51,7 +49,7 @@ def process_orders(port, index_list, sendMail=True):
 
     index = index_list
 
-    orders = ['buy', 'sell']
+    orders = ['sell', 'buy']
 
     for country in index:
         print(country)
@@ -100,6 +98,12 @@ def process_orders(port, index_list, sendMail=True):
                 if date != str(today):
                     continue
 
+                if "US" in country and row["SCORE"] < 8:
+                    continue
+
+                if "EURO" in country and row["SCORE"] < 6:
+                    continue
+
                 print('-------------------------------------------------------------------')
                 print("(" + str(port) + ') ****   ' + row['STOCK'] + ' - ' + row['NAME'] + ' - ' + row[
                     'ORDER'] + ' - ' + str(
@@ -119,7 +123,7 @@ def process_orders(port, index_list, sendMail=True):
 
                 elif "CANADA" in country:
                     currency = "CAD"
-                    valq = 700
+                    valq = 750
                     trailPercent = 6
                 else:
                     currency = "EUR"
@@ -129,6 +133,10 @@ def process_orders(port, index_list, sendMail=True):
                 order_type = row['ORDER']
 
                 quantity = valq // row['BUY']
+
+                if quantity == 0:
+                    print("Q")
+                    continue
 
                 # if quantity == 0:
                 #     quantity = 1
@@ -176,7 +184,7 @@ def process_orders(port, index_list, sendMail=True):
                                                             trailPercent=trailPercent)
 
                         app.add_order(contract, order)
-                        tps.sleep(2)
+                        tps.sleep(1)
 
                     except:
                         pass
