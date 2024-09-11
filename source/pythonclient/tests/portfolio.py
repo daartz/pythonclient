@@ -126,11 +126,11 @@ class TestApp(EWrapper, EClient):
         # self.porfolio["AccountName"] = self.accountName
         self.porfolio["Symbol"] = self.symbol
         self.porfolio["Stock"] = self.stock
-        self.porfolio["SecType"] = self.sectype
+        # self.porfolio["SecType"] = self.sectype
         self.porfolio["Exchange"] = self.exchange
         self.porfolio["Position"] = self.position
         # self.porfolio["Currency"] = self.currency
-        self.porfolio["ConID"] = self.conid
+        # self.porfolio["ConID"] = self.conid
         self.porfolio["MarketPrice"] = self.marketprice
         self.porfolio["MarketValue"] = self.marketvalue
         self.porfolio["AverageCost"] = self.averagecost

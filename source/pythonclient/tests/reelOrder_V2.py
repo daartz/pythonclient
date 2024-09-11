@@ -50,11 +50,11 @@ def process_orders(port, index_list, sendMail=True):
     index = index_list
 
     orders = ['sell', 'buy']
+    # orders = ['sell']
 
     for country in index:
         print(country)
 
-        # if country not in ["USX", "EUROX"]:
         if opening_hours(country) == False:
             continue
 
@@ -87,8 +87,8 @@ def process_orders(port, index_list, sendMail=True):
             for index, row in df_today.iterrows():
 
                 # try:
-                #     if "IPO" in country:
-                #         if row["CONF"] != "OK":
+                #     if "EURO" in country:
+                #         if row["CONF"] != "1":
                 #             continue
                 # except:
                 #     pass
@@ -118,12 +118,12 @@ def process_orders(port, index_list, sendMail=True):
                 valq = 0
                 if "US" in country:
                     currency = "USD"
-                    valq = 700
+                    valq = 600
                     trailPercent = 6
 
                 elif "CANADA" in country:
                     currency = "CAD"
-                    valq = 750
+                    valq = 700
                     trailPercent = 6
                 else:
                     currency = "EUR"
@@ -133,10 +133,6 @@ def process_orders(port, index_list, sendMail=True):
                 order_type = row['ORDER']
 
                 quantity = valq // row['BUY']
-
-                if quantity == 0:
-                    print("Q")
-                    continue
 
                 # if quantity == 0:
                 #     quantity = 1
@@ -154,6 +150,18 @@ def process_orders(port, index_list, sendMail=True):
                 contract = app.create_contract(stock, secType, exchange, currency)
 
                 if order_type == "BUY":
+
+                    # if country == 'US IPO':
+                    #     pass
+                    if "EURO" in country:
+                        pass
+                    # else:
+                    #     continue
+
+                    if quantity == 0:
+                        print("0 stock")
+                        continue
+
                     try:
                         if app.find_position(stock):
                             continue
@@ -198,7 +206,7 @@ def process_orders(port, index_list, sendMail=True):
                             if len(orderId_list) != 0:
                                 for num in orderId_list:
                                     app.cancelOrder(num, manualCancelOrderTime=formatted_cancel_time)
-                                    tps.sleep(0.30)
+                                    tps.sleep(0.5)
 
                             else:
                                 print("OrderId is empty")
