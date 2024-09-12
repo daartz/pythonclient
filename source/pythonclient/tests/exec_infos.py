@@ -7,7 +7,7 @@ from reelOrder_V2 import *
 
 import threading
 
-port_list = [port_perso_prod(), port_pro_prod()]
+port_list = [port_perso_prod(), port_pro_prod(), port_perso_test()]
 
 def process_portfolio(port_code):
     try:
@@ -25,6 +25,7 @@ def process_open_order(port_code):
 threads = []
 
 for port in port_list:
+    print("PORT TEST "+ str(port))
     portfolio_thread = threading.Thread(target=process_portfolio, args=(port,))
     portfolio_thread.start()
     threads.append(portfolio_thread)
