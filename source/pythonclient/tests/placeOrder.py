@@ -82,7 +82,18 @@ def sell_order(quantity):
     print("Sell Order created : " + order.orderType + " - Qty : " + str(order.totalQuantity) + " - " + order.action)
     return order
 
+def sell_short_order(quantity):
+    order = Order()
+    order.orderType = "MKT"  # Ordre au marché
+    order.totalQuantity = quantity
+    order.action = "SELL_SHORT"  # Spécifie qu'il s'agit d'une vente à découvert
+    order.eTradeOnly = False
+    order.firmQuoteOnly = False
+    order.transmit = True
+    # order.outsideRth = True  # Permettre l'exécution en dehors des heures de marché (si nécessaire)
 
+    print("Sell Short Order created : " + order.orderType + " - Qty : " + str(order.totalQuantity) + " - " + order.action)
+    return order
 
 
 # Fonction pour créer un ordre stop limit suiveur
@@ -427,6 +438,47 @@ class TradingApp(EWrapper, EClient):
         except Exception as e:
             print(stock + ": Error occurred:", e)
             print(stock + ": Stock not present")
+
+        return present
+
+    def find_position_vad(self, stock, position_type="BUY"):
+        """
+        Vérifie si le stock est présent dans le portefeuille avec la position longue ou courte.
+        Args:
+            stock (str): Le symbole de l'action à rechercher.
+            position_type (str): Type de position à vérifier, "long" ou "short".
+        Returns:
+            bool: True si la position est présente, sinon False.
+        """
+        present = False
+
+        file = f"C:\\TWS API\\source\\pythonclient\\tests\\Data\\portfolio_{self.port_code}.csv"
+        data = pd.read_csv(file)
+
+        try:
+            # Vérifie si le stock est présent dans le portefeuille
+            if (data['Symbol'] == stock).any():
+                # Détecte si c'est une position longue ou courte
+                if position_type == "BUY":
+                    # Vérifie si la quantité est positive (position longue)
+                    if (data.loc[data['Symbol'] == stock, 'Quantity'] > 0).any():
+                        print(f"({self.port_code}) {stock}: stock present in long position")
+                        present = True
+                    else:
+                        print(f"({self.port_code}) {stock}: stock present but not in long position")
+                elif position_type == "SELL":
+                    # Vérifie si la quantité est négative (position courte)
+                    if (data.loc[data['Symbol'] == stock, 'Quantity'] < 0).any():
+                        print(f"({self.port_code}) {stock}: stock present in short position")
+                        present = True
+                    else:
+                        print(f"({self.port_code}) {stock}: stock present but not in short position")
+            else:
+                print(f"({self.port_code}) {stock}: stock not present")
+
+        except Exception as e:
+            print(f"{stock}: Error occurred:", e)
+            print(f"{stock}: Stock not present")
 
         return present
 

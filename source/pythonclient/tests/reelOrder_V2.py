@@ -49,7 +49,12 @@ def process_orders(port, index_list, sendMail=True):
 
     index = index_list
 
-    orders = ['sell', 'buy']
+    orders = []
+    if port in (4002, 5002):
+        orders = ['vad sell', 'vad buy']
+    else:
+        orders = ['sell', 'buy']
+
     # orders = ['sell']
 
     for country in index:
@@ -223,6 +228,78 @@ def process_orders(port, index_list, sendMail=True):
                             tps.sleep(1)
 
                     except Exception as e:
+                        pass
+
+                if order_type == "VAD SELL":  # Vente à découvert
+
+                    if "EURO" in country:
+                        pass
+
+                    if quantity == 0:
+                        print("0 stock")
+                        continue
+
+                    try:
+                        # Vérifier si une position courte existe déjà pour l'action
+                        if app.find_position_vad(stock, position_type="SELL"):
+                            continue
+
+                        tps.sleep(1)
+
+                        orderId_list = app.orderId_present(stock, "SELL_SHORT", currency=currency)
+
+                        if len(orderId_list) != 0:
+                            continue
+
+                        # Placer l'ordre de vente à découvert
+                        order = sell_short_order(quantity)  # Utiliser une fonction spécifique pour la vente à découvert
+                        app.add_order(contract, order)
+
+                        # Calculer le trailing stop pour protéger la position
+                        trailAmt = round(price * trailPercent / 100, 2)
+                        trailStopPrice = round(price + trailAmt, 2)  # Inverser le sens pour une vente à découvert
+
+                        # Pour US et CANADA, stop price de +5% pour la vente à découvert
+                        # Pour Europe, trailing stop de 4%
+
+                        if "US" in country or "CANADA" in country:
+                            order = stop_order(quantity, StopPrice=round(trailStopPrice, 2))
+
+                        else:
+                            order = app.trailing_stop_order(quantity, trailStopPrice=trailStopPrice, trailAmt=trailAmt,
+                                                            trailPercent=trailPercent)
+
+                        app.add_order(contract, order)
+                        tps.sleep(1)
+
+                    except:
+                        pass
+
+                elif order_type == "VAD BUY":  # Couvrir une position courte
+                    try:
+                        # Vérifier si une position courte existe
+                        if app.find_position_vad(stock, position_type="SELL"):
+
+                            orderId_list = app.orderId_present(stock, "COVER", currency=currency)
+
+                            if len(orderId_list) != 0:
+                                for num in orderId_list:
+                                    app.cancelOrder(num, manualCancelOrderTime=formatted_cancel_time)
+                                    tps.sleep(0.5)
+
+                            else:
+                                print("OrderId is empty")
+
+                            quantity = app.getPosition(stock,
+                                                       position_type="short")  # Quantité pour couvrir la position courte
+                            tps.sleep(1)
+
+                            # Placer l'ordre de rachat pour couvrir la vente à découvert
+                            order = app.buy_order(quantity)
+                            app.add_order(contract, order)
+                            tps.sleep(1)
+
+                    except:
                         pass
 
     # Disconnect after processing all files

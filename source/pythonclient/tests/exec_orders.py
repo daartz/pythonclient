@@ -5,15 +5,15 @@ from portfolio import *
 
 import threading
 
-from connection_port import port_pro_prod, port_perso_prod
+from connection_port import port_pro_prod, port_perso_prod,port_perso_test
 
-port_list = [port_perso_prod(), port_pro_prod()]
+port_list = [port_perso_prod(), port_pro_prod(),port_perso_test()]
 
 # index_pro = ['USX','EUROX','US IPO','US9A', 'US9B', 'US9C','CANADA', 'ITALY','SPAIN','BELGIUM','GERMANY','NDL','FRANCE','EUROFRANCE']
 # index_pro = ['US','EUROPE',"CANADA","US IPO"]
-index_pro = ["CANADA","US IPO",'US',"EUROPE"]
+index_pro = ["CANADA","US IPO",'US']
 # index_perso = ['US9', 'ITALY','SPAIN','BELGIUM']
-index_test = ["VAD CANADA","VAD US IPO",'VAD US',"VAD EUROPE"]
+index_test = ["VAD CANADA","VAD US IPO",'VAD US']
 
 def process_reel_order(port_code, index, sendMail = True):
     try:
