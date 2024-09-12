@@ -266,7 +266,7 @@ def process_orders(port, index_list, sendMail=True):
                             order = stop_order(quantity, StopPrice=round(trailStopPrice, 2))
 
                         else:
-                            order = app.trailing_stop_order(quantity, trailStopPrice=trailStopPrice, trailAmt=trailAmt,
+                            order = app.trailing_stop_order(quantity,action="BUY", trailStopPrice=trailStopPrice, trailAmt=trailAmt,
                                                             trailPercent=trailPercent)
 
                         app.add_order(contract, order)
@@ -280,7 +280,7 @@ def process_orders(port, index_list, sendMail=True):
                         # Vérifier si une position courte existe
                         if app.find_position_vad(stock, position_type="SELL"):
 
-                            orderId_list = app.orderId_present(stock, "COVER", currency=currency)
+                            orderId_list = app.orderId_present(stock, "BUY", currency=currency)
 
                             if len(orderId_list) != 0:
                                 for num in orderId_list:

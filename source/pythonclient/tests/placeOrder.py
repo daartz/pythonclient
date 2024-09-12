@@ -86,7 +86,7 @@ def sell_short_order(quantity):
     order = Order()
     order.orderType = "MKT"  # Ordre au marché
     order.totalQuantity = quantity
-    order.action = "SELL_SHORT"  # Spécifie qu'il s'agit d'une vente à découvert
+    order.action = "SELL"  # Spécifie qu'il s'agit d'une vente à découvert
     order.eTradeOnly = False
     order.firmQuoteOnly = False
     order.transmit = True
@@ -97,7 +97,7 @@ def sell_short_order(quantity):
 
 
 # Fonction pour créer un ordre stop limit suiveur
-def trailing_stop_order(quantity, trailStopPrice=None, trailAmt=None, trailPercent=None):
+def trailing_stop_order(quantity,action='SELL', trailStopPrice=None, trailAmt=None, trailPercent=None):
     """
     Crée un ordre stop suiveur.
 
@@ -109,7 +109,7 @@ def trailing_stop_order(quantity, trailStopPrice=None, trailAmt=None, trailPerce
     :return: Un objet Order configuré comme un ordre stop suiveur
     """
     order = Order()
-    order.action = "SELL"
+    order.action = action
     order.totalQuantity = quantity
     order.orderType = "TRAIL"
 
