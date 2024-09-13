@@ -55,10 +55,10 @@ def buy_order(quantity):
     print("Buy Order created : " + order.orderType + " - Qty : " + str(order.totalQuantity) + " - " + order.action)
     return order
 
-def stop_order(quantity, StopPrice):
+def stop_order(quantity, StopPrice,action = "SELL"):
 
     order = Order()
-    order.action = "SELL"
+    order.action = action
     order.orderType = "STP"
     order.auxPrice = StopPrice
     order.totalQuantity = quantity
@@ -205,7 +205,7 @@ class TradingApp(EWrapper, EClient):
         return order
 
     # Fonction pour créer un ordre stop limit suiveur
-    def trailing_stop_order(self, quantity, trailStopPrice=None, trailAmt=None, trailPercent=None):
+    def trailing_stop_order(self, quantity,action = "SELL", trailStopPrice=None, trailAmt=None, trailPercent=None):
         """
         Crée un ordre stop suiveur.
 
@@ -217,7 +217,7 @@ class TradingApp(EWrapper, EClient):
         :return: Un objet Order configuré comme un ordre stop suiveur
         """
         order = Order()
-        order.action = "SELL"
+        order.action = action
         order.totalQuantity = quantity
         order.orderType = "TRAIL"
 
