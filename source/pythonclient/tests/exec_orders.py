@@ -5,27 +5,31 @@ from portfolio import *
 
 import threading
 
-from connection_port import port_pro_prod, port_perso_prod,port_perso_test
+from connection_port import port_pro_prod, port_perso_prod, port_perso_test
 
-port_list = [port_perso_prod(), port_pro_prod(),port_perso_test()]
+port_list = [port_perso_prod(), port_pro_prod(), port_perso_test()]
 
 # index_pro = ['USX','EUROX','US IPO','US9A', 'US9B', 'US9C','CANADA', 'ITALY','SPAIN','BELGIUM','GERMANY','NDL','FRANCE','EUROFRANCE']
 # index_pro = ['US','EUROPE',"CANADA","US IPO"]
-index_pro = ["CANADA","US IPO",'US']
+index_pro = ["CANADA", "US IPO", 'US']
+index_pro_2 = ["CANADA", "US IPO"]
 # index_perso = ['US9', 'ITALY','SPAIN','BELGIUM']
-index_test = ["CANADA","US IPO",'US', 'EUROPE']
+index_test = ["CANADA", "US IPO", 'US', 'EUROPE']
 
-def process_reel_order(port_code, index, sendMail = True):
+
+def process_reel_order(port_code, index, sendMail=True):
     try:
         process_orders(port_code, index, sendMail=sendMail)
     except Exception as e:
         print(f"Error processing open orders: {e}")
+
 
 def process_portfolio(port_code):
     try:
         main_portfolio(port_code)
     except Exception as e:
         print(f"Error processing portfolio: {e}")
+
 
 threads = []
 
@@ -36,12 +40,12 @@ for port in port_list:
 
 for port in port_list:
     if port == 4001:
-        open_order_thread = threading.Thread(target=process_reel_order, args=(port,index_pro, True,))
+        open_order_thread = threading.Thread(target=process_reel_order, args=(port, index_pro, True,))
         open_order_thread.start()
         threads.append(open_order_thread)
 
     elif port == 5001:
-        open_order_thread = threading.Thread(target=process_reel_order, args=(port,index_pro, True,))
+        open_order_thread = threading.Thread(target=process_reel_order, args=(port, index_pro, True,))
         open_order_thread.start()
         threads.append(open_order_thread)
 
@@ -55,4 +59,3 @@ for thread in threads:
     thread.join()
 
 print("Tous les threads ont terminé leur traitement.")
-

@@ -59,7 +59,7 @@ def process_orders(port, index_list, sendMail=True):
 
     for country in index:
         print(country)
-
+        #
         if opening_hours(country) == False:
             continue
 
@@ -277,9 +277,9 @@ def process_orders(port, index_list, sendMail=True):
                     except:
                         pass
 
-                elif order_type == "VAD BUY":  # Couvrir une position courte
+                elif order_type == "VAD BUY":  # Couvrir une position short
                     try:
-                        # Vérifier si une position courte existe
+                        # Vérifier si une position short existe
                         if app.find_position_vad(stock, position_type="SELL"):
 
                             orderId_list = app.orderId_present(stock, "BUY", currency=currency)
@@ -291,13 +291,13 @@ def process_orders(port, index_list, sendMail=True):
 
                             else:
                                 print("OrderId is empty")
-
-                            quantity = app.getPosition(stock,
-                                                       position_type="short")  # Quantité pour couvrir la position courte
+                            #
+                            quantity = abs(app.getPosition(stock))  # Quantité pour couvrir la position courte
                             tps.sleep(1)
 
+                            print(quantity)
                             # Placer l'ordre de rachat pour couvrir la vente à découvert
-                            order = app.buy_order(quantity)
+                            order = buy_order(quantity)
                             app.add_order(contract, order)
                             tps.sleep(1)
 

@@ -6,8 +6,10 @@ from datetime import datetime, timedelta
 import csv
 from send_mail import *
 
+
 def install_package(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
 
 try:
     import pandas as pd
@@ -28,6 +30,7 @@ from ibapi.wrapper import EWrapper
 # Exemple d'heure d'annulation : 24 heures à partir de maintenant, en UTC
 cancel_time = datetime.utcnow() + timedelta(days=1)
 formatted_cancel_time = cancel_time.strftime("%Y%m%d-%H:%M:%S")
+
 
 # Fonction pour créer un contrat
 def create_contract(symbol, secType, exchange, currency):
@@ -55,8 +58,8 @@ def buy_order(quantity):
     print("Buy Order created : " + order.orderType + " - Qty : " + str(order.totalQuantity) + " - " + order.action)
     return order
 
-def stop_order(quantity, StopPrice,action = "SELL"):
 
+def stop_order(quantity, StopPrice, action="SELL"):
     order = Order()
     order.action = action
     order.orderType = "STP"
@@ -68,6 +71,7 @@ def stop_order(quantity, StopPrice,action = "SELL"):
 
     print("Stop Order created : " + order.orderType + " - Qty : " + str(order.totalQuantity) + " - " + order.action)
     return order
+
 
 def sell_order(quantity):
     order = Order()
@@ -82,6 +86,7 @@ def sell_order(quantity):
     print("Sell Order created : " + order.orderType + " - Qty : " + str(order.totalQuantity) + " - " + order.action)
     return order
 
+
 def sell_short_order(quantity):
     order = Order()
     order.orderType = "MKT"  # Ordre au marché
@@ -92,12 +97,13 @@ def sell_short_order(quantity):
     order.transmit = True
     # order.outsideRth = True  # Permettre l'exécution en dehors des heures de marché (si nécessaire)
 
-    print("Sell Short Order created : " + order.orderType + " - Qty : " + str(order.totalQuantity) + " - " + order.action)
+    print(
+        "Sell Short Order created : " + order.orderType + " - Qty : " + str(order.totalQuantity) + " - " + order.action)
     return order
 
 
 # Fonction pour créer un ordre stop limit suiveur
-def trailing_stop_order(quantity,action='SELL', trailStopPrice=None, trailAmt=None, trailPercent=None):
+def trailing_stop_order(quantity, action='SELL', trailStopPrice=None, trailAmt=None, trailPercent=None):
     """
     Crée un ordre stop suiveur.
 
@@ -126,7 +132,8 @@ def trailing_stop_order(quantity,action='SELL', trailStopPrice=None, trailAmt=No
     elif trailPercent is not None:
         order.trailPercent = trailPercent  # Pourcentage du suivi
 
-    print("Trailing stop order created - quantity : "+ str(quantity) +" - trailPercent : " + str(trailPercent) + " - trailAmt : " + str(
+    print("Trailing stop order created - quantity : " + str(quantity) + " - trailPercent : " + str(
+        trailPercent) + " - trailAmt : " + str(
         trailAmt) + " - trailStopPrice : " + str(
         trailStopPrice))
 
@@ -180,16 +187,16 @@ class TradingApp(EWrapper, EClient):
         self.open_orders = []
         self.port_code = str(port)
 
-    def create_contract(self,symbol, secType, exchange, currency):
+    def create_contract(self, symbol, secType, exchange, currency):
         contract = Contract()
         contract.symbol = symbol
         contract.secType = secType
         contract.exchange = exchange
         contract.currency = currency
 
-        print("("+ self.port_code +") Contract created :" + symbol + " - " + secType + " - " + exchange + " - " + currency)
+        print(
+            "(" + self.port_code + ") Contract created :" + symbol + " - " + secType + " - " + exchange + " - " + currency)
         return contract
-
 
     def sell_order(self, quantity):
         order = Order()
@@ -205,7 +212,7 @@ class TradingApp(EWrapper, EClient):
         return order
 
     # Fonction pour créer un ordre stop limit suiveur
-    def trailing_stop_order(self, quantity,action = "SELL", trailStopPrice=None, trailAmt=None, trailPercent=None):
+    def trailing_stop_order(self, quantity, action="SELL", trailStopPrice=None, trailAmt=None, trailPercent=None):
         """
         Crée un ordre stop suiveur.
 
@@ -234,7 +241,8 @@ class TradingApp(EWrapper, EClient):
         elif trailPercent is not None:
             order.trailPercent = trailPercent  # Pourcentage du suivi
 
-        print("("+ self.port_code +") Trailing stop order created - quantity : " + str(quantity) + " - trailPercent : " + str(
+        print("(" + self.port_code + ") Trailing stop order created - quantity : " + str(
+            quantity) + " - trailPercent : " + str(
             trailPercent) + " - trailAmt : " + str(
             trailAmt) + " - trailStopPrice : " + str(
             trailStopPrice))
@@ -298,7 +306,8 @@ class TradingApp(EWrapper, EClient):
         self.data = pd.DataFrame(self.positions)
         self.data = self.data.loc[:, self.data.loc["Quantity"] != 0]
 
-        self.data.to_csv("C:\\TWS API\\source\\pythonclient\\tests\\Data\\positions" + self.port_code + ".csv",index=False)
+        self.data.to_csv("C:\\TWS API\\source\\pythonclient\\tests\\Data\\positions" + self.port_code + ".csv",
+                         index=False)
 
     def positionEnd(self):
         # Callback indiquant la fin de la transmission des positions
@@ -328,7 +337,7 @@ class TradingApp(EWrapper, EClient):
     def openOrderEnd(self):
         """ Indicates the end of the initial open orders' download """
         super().openOrderEnd()
-        print("("+self.port_code+") Received all open orders. Saving to CSV file.")
+        print("(" + self.port_code + ") Received all open orders. Saving to CSV file.")
         self.save_orders_to_csv()
 
     def save_orders_to_csv(self):
@@ -352,12 +361,13 @@ class TradingApp(EWrapper, EClient):
             for order in self.open_orders:
                 writer.writerow(order)
 
-        print("("+self.port_code+") "+f"Les ordres en cours ont été sauvegardés dans open_orders_{self.port_code}.csv")
+        print(
+            "(" + self.port_code + ") " + f"Les ordres en cours ont été sauvegardés dans open_orders_{self.port_code}.csv")
         time.sleep(2)
 
     def error(self, reqId, errorCode, errorString, *args):
         """ Handle errors with an additional arguments placeholder """
-        print("("+self.port_code+") "+f"Error: {reqId}, {errorCode}, {errorString}")
+        print("(" + self.port_code + ") " + f"Error: {reqId}, {errorCode}, {errorString}")
         # if args:
         #     print(f"Additional info: {args}")
 
@@ -377,18 +387,17 @@ class TradingApp(EWrapper, EClient):
             data = data[data['currency'] == currency]
 
             if stock in data['symbol'].values:  # Check if DataFrame is not empty
-                print("("+self.port_code+") OrderId present")
+                print("(" + self.port_code + ") OrderId present")
                 id_values = list(set(data['orderId'].values))
                 print(id_values)
                 return id_values
             else:
-                print("("+self.port_code+") No orderId present")
+                print("(" + self.port_code + ") No orderId present")
                 return []
         except Exception as e:
-            print("("+self.port_code+") Error:", e)
-            print("("+self.port_code+")No orderId present")
+            print("(" + self.port_code + ") Error:", e)
+            print("(" + self.port_code + ")No orderId present")
             return []
-
 
     def all_orderId(self):
         csv_file_path = f"C:\\TWS API\\source\\pythonclient\\tests\\Data\\open_orders_{self.port_code}.csv"
@@ -400,7 +409,7 @@ class TradingApp(EWrapper, EClient):
             except:
                 pass
             orderIds = list(set(data['orderId'].values))
-            print("("+self.port_code+")----ALL ORDERID----")
+            print("(" + self.port_code + ")----ALL ORDERID----")
             print(orderIds)
             return orderIds
         else:
@@ -430,10 +439,10 @@ class TradingApp(EWrapper, EClient):
 
         try:
             if (data['Symbol'] == stock).any():
-                print("("+ self.port_code + ") " + stock + ": stock present")
+                print("(" + self.port_code + ") " + stock + ": stock present")
                 present = True
             else:
-                print("("+ self.port_code + ") " + stock +": stock not present")
+                print("(" + self.port_code + ") " + stock + ": stock not present")
 
         except Exception as e:
             print(stock + ": Error occurred:", e)
@@ -456,29 +465,15 @@ class TradingApp(EWrapper, EClient):
         data = pd.read_csv(file)
 
         try:
-            # Vérifie si le stock est présent dans le portefeuille
             if (data['Symbol'] == stock).any():
-                # Détecte si c'est une position longue ou courte
-                if position_type == "BUY":
-                    # Vérifie si la quantité est positive (position longue)
-                    if (data.loc[data['Symbol'] == stock, 'Quantity'] > 0).any():
-                        print(f"({self.port_code}) {stock}: stock present in long position")
-                        present = True
-                    else:
-                        print(f"({self.port_code}) {stock}: stock present but not in long position")
-                elif position_type == "SELL":
-                    # Vérifie si la quantité est négative (position courte)
-                    if (data.loc[data['Symbol'] == stock, 'Quantity'] < 0).any():
-                        print(f"({self.port_code}) {stock}: stock present in short position")
-                        present = True
-                    else:
-                        print(f"({self.port_code}) {stock}: stock present but not in short position")
+                print("(" + self.port_code + ") " + stock + ": stock present")
+                present = True
             else:
-                print(f"({self.port_code}) {stock}: stock not present")
+                print("(" + self.port_code + ") " + stock + ": stock not present")
 
         except Exception as e:
-            print(f"{stock}: Error occurred:", e)
-            print(f"{stock}: Stock not present")
+            print(stock + ": Error occurred:", e)
+            print(stock + ": Stock not present")
 
         return present
 
@@ -492,7 +487,7 @@ class TradingApp(EWrapper, EClient):
             if not filtered_data.empty:
                 position = int(filtered_data.iloc[0]['Position'])
                 if position != 0:
-                    print("("+self.port_code+") Quantity for " + stock + " : " + str(position))
+                    print("(" + self.port_code + ") Quantity for " + stock + " : " + str(position))
         except Exception as e:
             print("Error occurred:", e)
 
