@@ -60,11 +60,11 @@ def process_orders(port, index_list, sendMail=True):
     for country in index:
         print(country)
 
-        if opening_hours(country) == False:
-            continue
-
-        if closing_hours(country) == False:
-            continue
+        # if opening_hours(country) == False:
+        #     continue
+        #
+        # if closing_hours(country) == False:
+        #     continue
 
         for order in orders:
 
@@ -193,7 +193,8 @@ def process_orders(port, index_list, sendMail=True):
 
                         else:
 
-                            order = app.trailing_stop_order(quantity, trailStopPrice=trailStopPrice, trailAmt=trailAmt,
+                            order = app.trailing_stop_order(quantity, action="SELL", trailStopPrice=trailStopPrice,
+                                                            trailAmt=trailAmt,
                                                             trailPercent=trailPercent)
 
                         app.add_order(contract, order)
@@ -263,10 +264,11 @@ def process_orders(port, index_list, sendMail=True):
                         # Pour Europe, trailing stop de 4%
 
                         if "US" in country or "CANADA" in country:
-                            order = stop_order(quantity, StopPrice=round(trailStopPrice, 2))
+                            order = stop_order(quantity, StopPrice=round(trailStopPrice, 2), action="BUY")
 
                         else:
-                            order = app.trailing_stop_order(quantity,action="BUY", trailStopPrice=trailStopPrice, trailAmt=trailAmt,
+                            order = app.trailing_stop_order(quantity, action="BUY", trailStopPrice=trailStopPrice,
+                                                            trailAmt=trailAmt,
                                                             trailPercent=trailPercent)
 
                         app.add_order(contract, order)
