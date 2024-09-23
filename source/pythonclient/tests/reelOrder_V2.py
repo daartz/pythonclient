@@ -5,27 +5,26 @@ from placeOrder import *
 from portfolio import *
 
 
+
 def ibkr_stock_name(stock):
-    x = ""
-    if stock == "AMP.MI":
-        x = "AMP2.MI"
-    elif stock == "RED.MC":
-        x = "RED1.MC"
-    elif stock == "UNI.MC":
-        x = "UNI1.MC"
-    elif stock == "SAB.MC":
-        x = "SAB1.MC"
-    elif stock == "DBG.PA":
-        x = "DBG1.PA"
-    else:
-        x = stock
+    mapping = {
+        "AMP.MI": "AMP2.MI",
+        "RED.MC": "RED1.MC",
+        "UNI.MC": "UNI1.MC",
+        "SAB.MC": "SAB1.MC",
+        "DBG.PA": "DBG1.PA",
 
-    return x
-
+    }
+    return mapping.get(stock, stock)
 
 def process_orders(port, index_list, sendMail=True):
     # Current date in YYYY-MM-DD format
     today = datetime.now().date()
+    hour = datetime.now().hour
+
+    now = datetime.now()
+    current_time = now.strftime("%H:%M")
+    print(current_time)
 
     # Connection details to IBKR
     HOST = '127.0.0.1'
@@ -53,18 +52,22 @@ def process_orders(port, index_list, sendMail=True):
     if port in (4002, 5002):
         orders = ['vad sell', 'vad buy']
     else:
-        orders = ['sell', 'buy']
-
-    # orders = ['sell']
+        orders = ['buy','sell']
 
     for country in index:
         print(country)
         #
-        if opening_hours(country) == False:
-            continue
+        if port in (4002, 5002):
+            if hour > 20:
+                continue
+            else:
+                pass
+        else:
+            if opening_hours(country) == False:
+                continue
 
-        if closing_hours(country) == False:
-            continue
+            if closing_hours(country) == False:
+                continue
 
         for order in orders:
 
@@ -91,12 +94,12 @@ def process_orders(port, index_list, sendMail=True):
             # Process orders
             for index, row in df_today.iterrows():
 
-                # try:
-                #     if "EURO" in country:
-                #         if row["CONF"] != "1":
-                #             continue
-                # except:
-                #     pass
+                try:
+                    if "EURO" in country:
+                        if row["CONF"] != "1":
+                            continue
+                except:
+                    pass
 
                 date = row['DATE'].strftime("%Y-%m-%d")
 
@@ -155,13 +158,6 @@ def process_orders(port, index_list, sendMail=True):
                 contract = app.create_contract(stock, secType, exchange, currency)
 
                 if order_type == "BUY":
-
-                    # if country == 'US IPO':
-                    #     pass
-                    if "EURO" in country:
-                        pass
-                    # else:
-                    #     continue
 
                     if quantity == 0:
                         print("0 stock")
@@ -292,7 +288,7 @@ def process_orders(port, index_list, sendMail=True):
                             else:
                                 print("OrderId is empty")
                             #
-                            quantity = abs(app.getPosition(stock))  # Quantité pour couvrir la position courte
+                            quantity = abs(app.getPosition(stock))  # Quantité pour couvrir la position short
                             tps.sleep(1)
 
                             print(quantity)
