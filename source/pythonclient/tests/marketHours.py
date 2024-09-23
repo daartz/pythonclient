@@ -87,7 +87,7 @@ def closing_hours(x):
     # Définissez les heures de début et de fin (17h00 et 17h30)
     if "US" in x or "CANADA" in x:
         # Passage à l'heure d'été aux États-Unis (heure avancée)
-        heure_debut = time(19, 30, 0)  # 20h00
+        heure_debut = time(19, 00, 0)  # 20h00
         heure_fin = time(22, 30, 0)  # 22h00
     else:
         heure_debut = time(14, 30, 0)

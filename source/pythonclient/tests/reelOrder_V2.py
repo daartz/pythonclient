@@ -5,7 +5,6 @@ from placeOrder import *
 from portfolio import *
 
 
-
 def ibkr_stock_name(stock):
     mapping = {
         "AMP.MI": "AMP2.MI",
@@ -17,14 +16,15 @@ def ibkr_stock_name(stock):
     }
     return mapping.get(stock, stock)
 
+
 def process_orders(port, index_list, sendMail=True):
     # Current date in YYYY-MM-DD format
     today = datetime.now().date()
     hour = datetime.now().hour
+    minute = datetime.now().minute
 
     now = datetime.now()
     current_time = now.strftime("%H:%M")
-    print(current_time)
 
     # Connection details to IBKR
     HOST = '127.0.0.1'
@@ -49,25 +49,19 @@ def process_orders(port, index_list, sendMail=True):
     index = index_list
 
     orders = []
-    if port in (4002, 5002):
+    if port in [4002, 5002]:
         orders = ['vad sell', 'vad buy']
-    else:
-        orders = ['buy','sell']
+    elif port in [4001, 5001]:
+        orders = ['sell', 'buy']
 
     for country in index:
         print(country)
+        # #
+        # if opening_hours(country) == False:
+        #     continue
         #
-        if port in (4002, 5002):
-            if hour > 20:
-                continue
-            else:
-                pass
-        else:
-            if opening_hours(country) == False:
-                continue
-
-            if closing_hours(country) == False:
-                continue
+        # if closing_hours(country) == False:
+        #     continue
 
         for order in orders:
 
@@ -157,7 +151,10 @@ def process_orders(port, index_list, sendMail=True):
 
                 contract = app.create_contract(stock, secType, exchange, currency)
 
-                if order_type == "BUY":
+                if order_type == "BUY" and minute > 30:
+
+                    if minute < 30 :
+                        continue
 
                     if quantity == 0:
                         print("0 stock")
@@ -194,12 +191,13 @@ def process_orders(port, index_list, sendMail=True):
                                                             trailPercent=trailPercent)
 
                         app.add_order(contract, order)
-                        tps.sleep(1)
+                        tps.sleep(1.5)
 
                     except:
                         pass
 
-                elif order_type == "SELL":
+                elif order_type == "SELL" and minute < 30:
+
                     try:
                         if app.find_position(stock):
 
@@ -219,18 +217,18 @@ def process_orders(port, index_list, sendMail=True):
                             # trailStopPrice = round(price - trailAmt,2)
                             # order = app.trailing_stop_order(quantity, trailStopPrice=trailStopPrice, trailAmt=trailAmt,
                             #                                 trailPercent=trailPercent)
-                            tps.sleep(1)
+                            tps.sleep(1.5)
                             order = app.sell_order(quantity)
                             app.add_order(contract, order)
-                            tps.sleep(1)
+                            tps.sleep(1.5)
 
                     except Exception as e:
                         pass
 
-                if order_type == "VAD SELL":  # Vente à découvert
+                elif order_type == "VAD SELL":  # Vente à découvert
 
-                    if "EURO" in country:
-                        pass
+                    # if "EURO" in country:
+                    #     pass
 
                     if quantity == 0:
                         print("0 stock")
@@ -274,6 +272,7 @@ def process_orders(port, index_list, sendMail=True):
                         pass
 
                 elif order_type == "VAD BUY":  # Couvrir une position short
+
                     try:
                         # Vérifier si une position short existe
                         if app.find_position_vad(stock, position_type="SELL"):
