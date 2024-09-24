@@ -49,19 +49,21 @@ def process_orders(port, index_list, sendMail=True):
     index = index_list
 
     orders = []
-    if port in [4002, 5002]:
-        orders = ['vad sell', 'vad buy']
-    elif port in [4001, 5001]:
-        orders = ['sell', 'buy']
+
+    if port in (4001, 5001):
+        orders = ['sell','buy']
+    elif port in (4002, 5002):
+        orders = ['vad sell', 'vad buy', 'sell', 'buy']
 
     for country in index:
         print(country)
-        # #
-        # if opening_hours(country) == False:
-        #     continue
-        #
-        # if closing_hours(country) == False:
-        #     continue
+
+        if port in [4001, 5001]:
+            if opening_hours(country) == False:
+                continue
+
+            if closing_hours(country) == False:
+                continue
 
         for order in orders:
 
@@ -88,12 +90,12 @@ def process_orders(port, index_list, sendMail=True):
             # Process orders
             for index, row in df_today.iterrows():
 
-                try:
-                    if "EURO" in country:
-                        if row["CONF"] != "1":
-                            continue
-                except:
-                    pass
+                # try:
+                #     if "EURO" in country:
+                #         if row["CONF"] != "1":
+                #             continue
+                # except:
+                #     pass
 
                 date = row['DATE'].strftime("%Y-%m-%d")
 
@@ -120,16 +122,16 @@ def process_orders(port, index_list, sendMail=True):
                 valq = 0
                 if "US" in country:
                     currency = "USD"
-                    valq = 600
+                    valq += 600
                     trailPercent = 6
 
                 elif "CANADA" in country:
                     currency = "CAD"
-                    valq = 700
+                    valq += 700
                     trailPercent = 6
                 else:
                     currency = "EUR"
-                    valq = 1200
+                    valq += 1200
                     trailPercent = 5
 
                 order_type = row['ORDER']
@@ -152,9 +154,6 @@ def process_orders(port, index_list, sendMail=True):
                 contract = app.create_contract(stock, secType, exchange, currency)
 
                 if order_type == "BUY" and minute > 30:
-
-                    if minute < 30 :
-                        continue
 
                     if quantity == 0:
                         print("0 stock")
@@ -191,36 +190,39 @@ def process_orders(port, index_list, sendMail=True):
                                                             trailPercent=trailPercent)
 
                         app.add_order(contract, order)
-                        tps.sleep(1.5)
+                        tps.sleep(1)
 
                     except:
                         pass
 
-                elif order_type == "SELL" and minute < 30:
+                elif order_type == "SELL":
 
                     try:
                         if app.find_position(stock):
 
                             orderId_list = app.orderId_present(stock, "SELL", currency=currency)
+                            tps.sleep(0.2)
 
-                            if len(orderId_list) != 0:
+                            if orderId_list:
                                 for num in orderId_list:
                                     app.cancelOrder(num, manualCancelOrderTime=formatted_cancel_time)
-                                    tps.sleep(0.5)
+                                    tps.sleep(1)
+
+                                quantity = app.getPosition(stock)
+                                # trailPercent = 0.05
+                                # trailAmt = round(price * trailPercent / 100, 2)
+                                # trailStopPrice = round(price - trailAmt,2)
+                                # order = app.trailing_stop_order(quantity, trailStopPrice=trailStopPrice, trailAmt=trailAmt,
+                                #                                 trailPercent=trailPercent)
+                                tps.sleep(1)
+                                order = sell_order(quantity)
+                                app.add_order(contract, order)
+                                tps.sleep(1)
+
 
                             else:
                                 print("OrderId is empty")
 
-                            quantity = app.getPosition(stock)
-                            # trailPercent = 0.05
-                            # trailAmt = round(price * trailPercent / 100, 2)
-                            # trailStopPrice = round(price - trailAmt,2)
-                            # order = app.trailing_stop_order(quantity, trailStopPrice=trailStopPrice, trailAmt=trailAmt,
-                            #                                 trailPercent=trailPercent)
-                            tps.sleep(1.5)
-                            order = app.sell_order(quantity)
-                            app.add_order(contract, order)
-                            tps.sleep(1.5)
 
                     except Exception as e:
                         pass
