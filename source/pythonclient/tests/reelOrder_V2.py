@@ -51,7 +51,7 @@ def process_orders(port, index_list, sendMail=True):
     orders = []
 
     if port in (4001, 5001):
-        orders = ['sell','buy']
+        orders = ['sell', 'buy']
     elif port == 4002:
         orders = ['vad sell', 'vad buy', 'sell', 'buy']
 
@@ -153,7 +153,7 @@ def process_orders(port, index_list, sendMail=True):
 
                 contract = app.create_contract(stock, secType, exchange, currency)
 
-                if order_type == "BUY" and minute > 30 :
+                if order_type == "BUY" and minute > 30:
 
                     if quantity == 0:
                         print("0 stock")
@@ -203,14 +203,14 @@ def process_orders(port, index_list, sendMail=True):
 
                             orderId_list = app.orderId_present(stock, "SELL", currency=currency)
 
-                            # if orderId_list:
-                            try:
-                                for num in orderId_list:
-                                    app.cancelOrder(num)
+                            if orderId_list:
+                                try:
+                                    for num in orderId_list:
+                                        app.cancelOrder(num)
+                                        tps.sleep(1)
 
-                                    tps.sleep(1)
-                            except Exception as e:
-                                print(e)
+                                except Exception as e:
+                                    print(e)
 
                             else:
 
@@ -231,9 +231,7 @@ def process_orders(port, index_list, sendMail=True):
                             tps.sleep(1)
 
                             order = app.sell_order(quantity)
-
                             app.add_order(contract, order)
-
                             tps.sleep(1)
 
                     except Exception as e:
@@ -242,9 +240,6 @@ def process_orders(port, index_list, sendMail=True):
 
 
                 elif order_type == "VAD SELL":  # Vente à découvert
-
-                    # if "EURO" in country:
-                    #     pass
 
                     if quantity == 0:
                         print("0 stock")
@@ -296,9 +291,13 @@ def process_orders(port, index_list, sendMail=True):
                             orderId_list = app.orderId_present(stock, "BUY", currency=currency)
 
                             if len(orderId_list) != 0:
-                                for num in orderId_list:
-                                    app.cancelOrder(num, manualCancelOrderTime=formatted_cancel_time)
-                                    tps.sleep(0.5)
+                                try:
+                                    for num in orderId_list:
+                                        app.cancelOrder(num)
+                                        tps.sleep(0.5)
+
+                                except Exception as e:
+                                    print(e)
 
                             else:
                                 print("OrderId is empty")
