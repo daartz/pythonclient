@@ -52,7 +52,7 @@ def process_orders(port, index_list, sendMail=True):
 
     if port in (4001, 5001):
         orders = ['sell','buy']
-    elif port in (4002, 5002):
+    elif port == 4002:
         orders = ['vad sell', 'vad buy', 'sell', 'buy']
 
     for country in index:
@@ -153,7 +153,7 @@ def process_orders(port, index_list, sendMail=True):
 
                 contract = app.create_contract(stock, secType, exchange, currency)
 
-                if order_type == "BUY" and minute > 30:
+                if order_type == "BUY" and minute > 30 :
 
                     if quantity == 0:
                         print("0 stock")
@@ -198,34 +198,48 @@ def process_orders(port, index_list, sendMail=True):
                 elif order_type == "SELL":
 
                     try:
+
                         if app.find_position(stock):
 
                             orderId_list = app.orderId_present(stock, "SELL", currency=currency)
-                            tps.sleep(0.2)
 
-                            if orderId_list:
+                            # if orderId_list:
+                            try:
                                 for num in orderId_list:
-                                    app.cancelOrder(num, manualCancelOrderTime=formatted_cancel_time)
+                                    app.cancelOrder(num)
+
                                     tps.sleep(1)
-
-                                quantity = app.getPosition(stock)
-                                # trailPercent = 0.05
-                                # trailAmt = round(price * trailPercent / 100, 2)
-                                # trailStopPrice = round(price - trailAmt,2)
-                                # order = app.trailing_stop_order(quantity, trailStopPrice=trailStopPrice, trailAmt=trailAmt,
-                                #                                 trailPercent=trailPercent)
-                                tps.sleep(1)
-                                order = sell_order(quantity)
-                                app.add_order(contract, order)
-                                tps.sleep(1)
-
+                            except Exception as e:
+                                print(e)
 
                             else:
+
                                 print("OrderId is empty")
 
+                            quantity = app.getPosition(stock)
+
+                            # trailPercent = 0.05
+
+                            # trailAmt = round(price * trailPercent / 100, 2)
+
+                            # trailStopPrice = round(price - trailAmt,2)
+
+                            # order = app.trailing_stop_order(quantity, trailStopPrice=trailStopPrice, trailAmt=trailAmt,
+
+                            #                                 trailPercent=trailPercent)
+
+                            tps.sleep(1)
+
+                            order = app.sell_order(quantity)
+
+                            app.add_order(contract, order)
+
+                            tps.sleep(1)
 
                     except Exception as e:
+
                         pass
+
 
                 elif order_type == "VAD SELL":  # Vente à découvert
 
