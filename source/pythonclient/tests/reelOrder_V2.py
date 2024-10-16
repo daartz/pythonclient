@@ -51,9 +51,12 @@ def process_orders(port, index_list, sendMail=True):
     orders = []
 
     if port in (4001, 5001):
-        orders = ['sell', 'buy']
+        if minute > 30 :
+            orders = ['sell','buy']
+        else:
+            orders = ['sell']
     elif port == 4002:
-        orders = ['vad sell', 'vad buy', 'sell', 'buy']
+        orders = ['vad sell', 'vad buy']
 
     for country in index:
         print(country)
@@ -120,15 +123,24 @@ def process_orders(port, index_list, sendMail=True):
 
                 trailPercent = 5
                 valq = 0
+
                 if "US" in country:
                     currency = "USD"
-                    valq += 600
                     trailPercent = 6
+
+                    if port in [4001]:
+                        valq += 700
+                    else:
+                        valq += 800
 
                 elif "CANADA" in country:
                     currency = "CAD"
-                    valq += 700
-                    trailPercent = 6
+                    trailPercent = 5
+
+                    if port in [4001]:
+                        valq += 800
+                    else:
+                        valq += 900
                 else:
                     currency = "EUR"
                     valq += 1200
@@ -153,7 +165,7 @@ def process_orders(port, index_list, sendMail=True):
 
                 contract = app.create_contract(stock, secType, exchange, currency)
 
-                if order_type == "BUY" and minute > 30:
+                if order_type == "BUY" :
 
                     if quantity == 0:
                         print("0 stock")
@@ -176,10 +188,10 @@ def process_orders(port, index_list, sendMail=True):
                         trailAmt = round(price * trailPercent / 100, 2)
                         trailStopPrice = round(price - trailAmt, 2)
 
-                        # Pour US et CANADA, stop price de -5%
-                        # Pour Europe, trailing stop de 4%
+                        # Pour US, stop price de -6%
+                        # Pour Canada, Europe, trailing stop de 4%
 
-                        if "US" in country or "CANADA" in country:
+                        if "US" in country:
 
                             order = stop_order(quantity, StopPrice=round(trailStopPrice, 2))
 
@@ -217,6 +229,7 @@ def process_orders(port, index_list, sendMail=True):
                                 print("OrderId is empty")
 
                             quantity = app.getPosition(stock)
+                            print(quantity)
 
                             # trailPercent = 0.05
 
@@ -228,11 +241,11 @@ def process_orders(port, index_list, sendMail=True):
 
                             #                                 trailPercent=trailPercent)
 
-                            tps.sleep(1)
+                            tps.sleep(0.8)
 
                             order = app.sell_order(quantity)
                             app.add_order(contract, order)
-                            tps.sleep(1)
+                            tps.sleep(0.8)
 
                     except Exception as e:
 
