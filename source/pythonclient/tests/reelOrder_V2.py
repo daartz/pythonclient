@@ -5,18 +5,6 @@ from placeOrder import *
 from portfolio import *
 
 
-def ibkr_stock_name(stock):
-    mapping = {
-        "AMP.MI": "AMP2.MI",
-        "RED.MC": "RED1.MC",
-        "UNI.MC": "UNI1.MC",
-        "SAB.MC": "SAB1.MC",
-        "DBG.PA": "DBG1.PA",
-
-    }
-    return mapping.get(stock, stock)
-
-
 def process_orders(port, index_list, sendMail=True):
     # Current date in YYYY-MM-DD format
     today = datetime.now().date()
@@ -52,7 +40,7 @@ def process_orders(port, index_list, sendMail=True):
 
     if port in (4001, 5001):
         if minute > 30 :
-            orders = ['sell']
+            orders = ['sell','buy']
         else:
             orders = ['sell']
     elif port == 4002:
