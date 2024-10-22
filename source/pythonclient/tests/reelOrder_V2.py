@@ -119,7 +119,7 @@ def process_orders(port, index_list, sendMail=True):
                     if port in [4001]:
                         valq += 700
                     else:
-                        valq += 800
+                        valq += 750
 
                 elif "CANADA" in country:
                     currency = "CAD"
@@ -128,7 +128,7 @@ def process_orders(port, index_list, sendMail=True):
                     if port in [4001]:
                         valq += 800
                     else:
-                        valq += 900
+                        valq += 850
                 else:
                     currency = "EUR"
                     valq += 1200
