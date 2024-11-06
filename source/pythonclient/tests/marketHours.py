@@ -90,8 +90,8 @@ def closing_hours(x):
         heure_debut = time(19, 00, 0)  # 20h00
         heure_fin = time(22, 30, 0)  # 22h00
     else:
-        heure_debut = time(14, 30, 0)
-        heure_fin = time(17, 30, 0)
+        heure_debut = time(13, 30, 0)
+        heure_fin = time(18, 30, 0)
 
     if heure_gmt.weekday() in [5, 6]:
         print(x)

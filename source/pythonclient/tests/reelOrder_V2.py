@@ -117,18 +117,18 @@ def process_orders(port, index_list, sendMail=True):
                     trailPercent = 6
 
                     if port in [4001]:
-                        valq += 700
+                        valq += 600
                     else:
-                        valq += 750
+                        valq += 700
 
                 elif "CANADA" in country:
                     currency = "CAD"
                     trailPercent = 5
 
                     if port in [4001]:
-                        valq += 800
+                        valq += 700
                     else:
-                        valq += 850
+                        valq += 750
                 else:
                     currency = "EUR"
                     valq += 1200
