@@ -39,8 +39,8 @@ def process_orders(port, index_list, sendMail=True):
     orders = []
 
     if port in (4001, 5001):
-        if minute > 30 :
-            orders = ['sell','buy']
+        if minute > 30:
+            orders = ['sell']
         else:
             orders = ['sell']
     elif port == 4002:
@@ -48,15 +48,17 @@ def process_orders(port, index_list, sendMail=True):
 
     for country in index:
         print(country)
-
-        if port in [4001, 5001]:
-            if opening_hours(country) == False:
-                continue
-
-            if closing_hours(country) == False:
-                continue
+        #
+        # if port in [4001, 5001, 4002]:
+        #     if opening_hours(country) == False:
+        #         continue
 
         for order in orders:
+
+            if port in [4001, 5001]:
+                if order == 'buy' and closing_hours(country) == False:
+                    print("Not closing hours for buy orders")
+                    continue
 
             csv_file_path = f'C:\\Users\\daart\\OneDrive\\PROREALTIME\\Signals\\{country} {order} signals {today}.csv'
 
@@ -114,16 +116,16 @@ def process_orders(port, index_list, sendMail=True):
 
                 if "US" in country:
                     currency = "USD"
-                    trailPercent = 6
+                    trailPercent = 8
 
                     if port in [4001]:
-                        valq += 600
+                        valq += 500
                     else:
-                        valq += 700
+                        valq += 550
 
                 elif "CANADA" in country:
                     currency = "CAD"
-                    trailPercent = 5
+                    trailPercent = 7
 
                     if port in [4001]:
                         valq += 700
@@ -153,7 +155,7 @@ def process_orders(port, index_list, sendMail=True):
 
                 contract = app.create_contract(stock, secType, exchange, currency)
 
-                if order_type == "BUY" :
+                if order_type == "BUY":
 
                     if quantity == 0:
                         print("0 stock")
@@ -171,6 +173,7 @@ def process_orders(port, index_list, sendMail=True):
                             continue
 
                         order = buy_order(quantity)
+                        order.outsideRth = True
                         app.add_order(contract, order)
 
                         trailAmt = round(price * trailPercent / 100, 2)
@@ -188,7 +191,7 @@ def process_orders(port, index_list, sendMail=True):
                             order = app.trailing_stop_order(quantity, action="SELL", trailStopPrice=trailStopPrice,
                                                             trailAmt=trailAmt,
                                                             trailPercent=trailPercent)
-
+                        order.outsideRth = True
                         app.add_order(contract, order)
                         tps.sleep(1)
 
@@ -232,6 +235,7 @@ def process_orders(port, index_list, sendMail=True):
                             tps.sleep(0.8)
 
                             order = app.sell_order(quantity)
+                            order.outsideRth = True
                             app.add_order(contract, order)
                             tps.sleep(0.8)
 
@@ -260,6 +264,7 @@ def process_orders(port, index_list, sendMail=True):
 
                         # Placer l'ordre de vente à découvert
                         order = sell_short_order(quantity)  # Utiliser une fonction spécifique pour la vente à découvert
+                        order.outsideRth = True
                         app.add_order(contract, order)
 
                         # Calculer le trailing stop pour protéger la position
@@ -276,7 +281,7 @@ def process_orders(port, index_list, sendMail=True):
                             order = app.trailing_stop_order(quantity, action="BUY", trailStopPrice=trailStopPrice,
                                                             trailAmt=trailAmt,
                                                             trailPercent=trailPercent)
-
+                        order.outsideRth = True
                         app.add_order(contract, order)
                         tps.sleep(1)
 
@@ -309,6 +314,7 @@ def process_orders(port, index_list, sendMail=True):
                             print(quantity)
                             # Placer l'ordre de rachat pour couvrir la vente à découvert
                             order = buy_order(quantity)
+                            order.outsideRth = True
                             app.add_order(contract, order)
                             tps.sleep(1)
 

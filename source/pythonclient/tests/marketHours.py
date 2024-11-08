@@ -87,10 +87,10 @@ def closing_hours(x):
     # Définissez les heures de début et de fin (17h00 et 17h30)
     if "US" in x or "CANADA" in x:
         # Passage à l'heure d'été aux États-Unis (heure avancée)
-        heure_debut = time(19, 00, 0)  # 20h00
-        heure_fin = time(22, 30, 0)  # 22h00
+        heure_debut = time(20, 00, 0)  # 20h00
+        heure_fin = time(24, 00, 0)  # 22h00
     else:
-        heure_debut = time(13, 30, 0)
+        heure_debut = time(15, 30, 0)
         heure_fin = time(18, 30, 0)
 
     if heure_gmt.weekday() in [5, 6]:
@@ -113,32 +113,41 @@ def closing_hours(x):
     return closing
 
 def opening_hours(x):
-    # Obtenez l'heure GMT actuelle
-    heure_gmt = datetime.now(timezone.utc)
+    # Obtenez l'heure et le jour actuels en GMT
+    now_gmt = datetime.now(timezone.utc)
+    heure_gmt = now_gmt.time()
+    jour_semaine = now_gmt.weekday()  # Lundi = 0, Dimanche = 6
     opening = False
 
-    if "US" in x or "CANADA" in x:
-        # Passage à l'heure d'été aux États-Unis (heure avancée)
-        heure_debut = time(13, 30, 0)
-        heure_fin = time(22, 30, 0)
-    else:
-        heure_debut = time(7, 0, 0)
-        heure_fin = time(17, 30, 0)
+    # Vérifier que c'est un jour ouvré (lundi à vendredi)
+    if jour_semaine in range(5):  # Exclut samedi (5) et dimanche (6)
 
-    if heure_gmt.weekday() in [5, 6]:
-        print("Jour de fermeture des marchés")
-    # Vérifiez si l'heure actuelle est dans la plage
-    elif heure_debut <= heure_gmt.time() <= heure_fin:
-        opening = True
-        print(x)
-        print(heure_gmt)
-        print("Jour d'ouverture des marchés")
-        print("Marché ouvert :" + str(opening))
+        if "US" in x or "CANADA" in x:
+            # Plage horaire en GMT pour le marché US/Canada incluant pré-ouverture et after-hours
+            heure_debut = time(13, 30)  # 9h30 ET correspond à 13h30 GMT
+            heure_fin_avant_minuit = time(23, 59)  # Heure de fin avant minuit
+            heure_fin_apres_minuit = time(1, 0)    # Heure de fin après minuit (le lendemain)
+
+            # Vérifie si l'heure actuelle est dans la plage de trading étendue (avant ou après minuit)
+            if (heure_debut <= heure_gmt <= heure_fin_avant_minuit) or (time(0, 0) <= heure_gmt <= heure_fin_apres_minuit):
+                opening = True
+                print(f"{x}: Market open - Including Outside Regular Trading Hours")
+            else:
+                print(f"{x}: Market closed - Outside trading hours")
+
+        else:
+            # Plage horaire en GMT pour les marchés européens
+            heure_debut = time(7, 0)    # Heure de début pour les marchés européens (GMT)
+            heure_fin = time(20, 0)     # Heure de fin pour les marchés européens (GMT)
+
+            if heure_debut <= heure_gmt <= heure_fin:
+                opening = True
+                print(f"{x}: European market open")
+            else:
+                print(f"{x}: European market closed")
+
     else:
-        print(x)
-        print(heure_gmt)
-        print("Jour d'ouverture des marchés")
-        print("Marché ouvert :" + str(opening))
+        print("Marché fermé - Week-end")
 
     return opening
 
