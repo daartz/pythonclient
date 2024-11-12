@@ -125,7 +125,7 @@ def opening_hours(x):
         if "US" in x or "CANADA" in x:
             # Plage horaire en GMT pour le marché US/Canada incluant pré-ouverture et after-hours
             heure_debut = time(13, 30)  # 9h30 ET correspond à 13h30 GMT
-            heure_fin_avant_minuit = time(23, 59)  # Heure de fin avant minuit
+            heure_fin_avant_minuit = time(22,59)  # Heure de fin avant minuit
             heure_fin_apres_minuit = time(1, 0)    # Heure de fin après minuit (le lendemain)
 
             # Vérifie si l'heure actuelle est dans la plage de trading étendue (avant ou après minuit)

@@ -40,7 +40,7 @@ def process_orders(port, index_list, sendMail=True):
 
     if port in (4001, 5001):
         if minute > 30:
-            orders = ['sell']
+            orders = ['sell','buy']
         else:
             orders = ['sell']
     elif port == 4002:
