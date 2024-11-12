@@ -39,10 +39,11 @@ def process_orders(port, index_list, sendMail=True):
     orders = []
 
     if port in (4001, 5001):
-        if minute > 30:
-            orders = ['sell','buy']
-        else:
-            orders = ['sell']
+        orders = ['sell', 'buy']
+        # if minute > 30:
+        #     orders = ['sell','buy']
+        # else:
+        #     orders = ['sell']
     elif port == 4002:
         orders = ['vad sell', 'vad buy']
 
@@ -55,10 +56,10 @@ def process_orders(port, index_list, sendMail=True):
 
         for order in orders:
 
-            if port in [4001, 5001]:
-                if order == 'buy' and closing_hours(country) == False:
-                    print("Not closing hours for buy orders")
-                    continue
+            # if port in [4001, 5001]:
+            #     if order == 'buy' and closing_hours(country) == False:
+            #         print("Not closing hours for buy orders")
+            #         continue
 
             csv_file_path = f'C:\\Users\\daart\\OneDrive\\PROREALTIME\\Signals\\{country} {order} signals {today}.csv'
 
