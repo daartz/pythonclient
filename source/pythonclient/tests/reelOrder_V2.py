@@ -129,9 +129,9 @@ def process_orders(port, index_list, sendMail=True):
                     trailPercent = 7
 
                     if port in [4001]:
-                        valq += 700
+                        valq += 600
                     else:
-                        valq += 750
+                        valq += 650
                 else:
                     currency = "EUR"
                     valq += 1200
@@ -179,6 +179,7 @@ def process_orders(port, index_list, sendMail=True):
 
                         trailAmt = round(price * trailPercent / 100, 2)
                         trailStopPrice = round(price - trailAmt, 2)
+                        trailStopPrice = data['SL']
 
                         # Pour US, stop price de -6%
                         # Pour Canada, Europe, trailing stop de 4%
@@ -270,8 +271,8 @@ def process_orders(port, index_list, sendMail=True):
 
                         # Calculer le trailing stop pour protéger la position
                         trailAmt = round(price * trailPercent / 100, 2)
-                        trailStopPrice = round(price + trailAmt, 2)  # Inverser le sens pour une vente à découvert
-
+                        # trailStopPrice = round(price + trailAmt, 2)  # Inverser le sens pour une vente à découvert
+                        trailStopPrice = data['SL']
                         # Pour US et CANADA, stop price de +5% pour la vente à découvert
                         # Pour Europe, trailing stop de 4%
 
