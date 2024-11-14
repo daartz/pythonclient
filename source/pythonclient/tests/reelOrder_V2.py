@@ -39,9 +39,9 @@ def process_orders(port, index_list, sendMail=True):
     orders = []
 
     if port in (4001, 5001):
-        orders = ['sell', 'buy']
+        orders = ['sell', 'buy','hold']
     elif port == 4002:
-        orders = ['vad sell', 'vad buy']
+        orders = ['vad sell', 'vad buy','vad hold']
 
     for country in index:
         print(country)
@@ -69,8 +69,6 @@ def process_orders(port, index_list, sendMail=True):
 
             # Filter the DataFrame for today's date
             df_today = df[df['DATE'].dt.date == today]
-
-            df_today = df_today[df_today['ORDER'] != 'HOLD']
 
             # Process orders
             for index, row in df_today.iterrows():
@@ -225,6 +223,53 @@ def process_orders(port, index_list, sendMail=True):
 
                     except Exception as e:
 
+                        pass
+
+                elif order_type == "HOLD":
+
+                    try:
+
+                        if app.find_position(stock):
+
+                            orderId_list = app.orderId_present(stock, "SELL", currency=currency)
+
+                            if orderId_list:
+                                try:
+                                    for num in orderId_list:
+                                        app.cancelOrder(num)
+                                        tps.sleep(1)
+
+                                except Exception as e:
+                                    print(e)
+
+                            else:
+
+                                print("OrderId is empty")
+
+                            quantity = app.getPosition(stock)
+                            print(quantity)
+
+                            trailAmt = round(price * trailPercent / 100, 2)
+                            trailStopPrice = round(price - trailAmt, 2)
+                            trailStopPrice = data['SL']
+
+                            # Pour US, stop price de -6%
+                            # Pour Canada, Europe, trailing stop de 4%
+
+                            if "US" in country or "CANADA" in country:
+
+                                order = stop_order(quantity, StopPrice=round(trailStopPrice, 2))
+
+                            else:
+
+                                order = app.trailing_stop_order(quantity, action="SELL", trailStopPrice=trailStopPrice,
+                                                                trailAmt=trailAmt,
+                                                                trailPercent=trailPercent)
+                            order.outsideRth = True
+                            app.add_order(contract, order)
+                            tps.sleep(1)
+
+                    except:
                         pass
 
                 elif order_type == "VAD SELL":  # Vente à découvert
