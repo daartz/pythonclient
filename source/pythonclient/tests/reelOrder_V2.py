@@ -80,12 +80,6 @@ def process_orders(port, index_list, sendMail=True):
                 if date != str(today):
                     continue
 
-                if "US" in country and row["SCORE"] < 8:
-                    continue
-
-                if "EURO" in country and row["SCORE"] < 6:
-                    continue
-
                 print('-------------------------------------------------------------------')
                 print("(" + str(port) + ') ****   ' + row['STOCK'] + ' - ' + row['NAME'] + ' - ' + row[
                     'ORDER'] + ' - ' + str(
@@ -142,6 +136,10 @@ def process_orders(port, index_list, sendMail=True):
 
                 if order_type == "BUY":
 
+                    if row["SCORE"] < 5:
+                        print("Score inférieur à 5")
+                        continue
+
                     if quantity == 0:
                         print("0 stock")
                         continue
@@ -168,7 +166,7 @@ def process_orders(port, index_list, sendMail=True):
                         # Pour US, stop price de -6%
                         # Pour Canada, Europe, trailing stop de 4%
 
-                        if "US" in country:
+                        if "US" in country or "CANADA" in country:
 
                             order = stop_order(quantity, StopPrice=round(trailStopPrice, 2))
 
@@ -228,7 +226,6 @@ def process_orders(port, index_list, sendMail=True):
                     except Exception as e:
 
                         pass
-
 
                 elif order_type == "VAD SELL":  # Vente à découvert
 
@@ -303,7 +300,6 @@ def process_orders(port, index_list, sendMail=True):
                             order.outsideRth = True
                             app.add_order(contract, order)
                             tps.sleep(1)
-
                     except:
                         pass
 
