@@ -35,7 +35,7 @@ def process_orders(port, index_list, sendMail=True):
     data = pd.read_csv(file, index_col=0)
 
     index = index_list
-
+    stop_loss = 0
     orders = []
 
     if port in (4001, 5001):
@@ -154,12 +154,12 @@ def process_orders(port, index_list, sendMail=True):
                             continue
 
                         order = buy_order(quantity)
-                        order.outsideRth = True
+                        # order.outsideRth = True
                         app.add_order(contract, order)
 
                         trailAmt = round(price * trailPercent / 100, 2)
                         trailStopPrice = round(price - trailAmt, 2)
-                        trailStopPrice = data['SL']
+                        trailStopPrice = row['SL']
 
                         # Pour US, stop price de -6%
                         # Pour Canada, Europe, trailing stop de 4%
@@ -173,7 +173,7 @@ def process_orders(port, index_list, sendMail=True):
                             order = app.trailing_stop_order(quantity, action="SELL", trailStopPrice=trailStopPrice,
                                                             trailAmt=trailAmt,
                                                             trailPercent=trailPercent)
-                        order.outsideRth = True
+                        # order.outsideRth = True
                         app.add_order(contract, order)
                         tps.sleep(1)
 
@@ -249,23 +249,11 @@ def process_orders(port, index_list, sendMail=True):
                             quantity = app.getPosition(stock)
                             print(quantity)
 
-                            trailAmt = round(price * trailPercent / 100, 2)
-                            trailStopPrice = round(price - trailAmt, 2)
-                            trailStopPrice = data['SL']
+                            trailStopPrice = float(row['SL'])
+                            print(row['SL'])
 
-                            # Pour US, stop price de -6%
-                            # Pour Canada, Europe, trailing stop de 4%
+                            order = stop_order(quantity, StopPrice=round(trailStopPrice, 2))
 
-                            if "US" in country or "CANADA" in country:
-
-                                order = stop_order(quantity, StopPrice=round(trailStopPrice, 2))
-
-                            else:
-
-                                order = app.trailing_stop_order(quantity, action="SELL", trailStopPrice=trailStopPrice,
-                                                                trailAmt=trailAmt,
-                                                                trailPercent=trailPercent)
-                            order.outsideRth = True
                             app.add_order(contract, order)
                             tps.sleep(1)
 
