@@ -175,7 +175,7 @@ def process_orders(port, index_list, sendMail=True):
                                                             trailPercent=trailPercent)
                         # order.outsideRth = True
                         app.add_order(contract, order)
-                        tps.sleep(1)
+                        tps.sleep(0.5)
 
                     except:
                         pass
@@ -214,12 +214,12 @@ def process_orders(port, index_list, sendMail=True):
 
                             #                                 trailPercent=trailPercent)
 
-                            tps.sleep(0.8)
+                            tps.sleep(0.5)
 
                             order = app.sell_order(quantity)
                             order.outsideRth = True
                             app.add_order(contract, order)
-                            tps.sleep(0.8)
+                            tps.sleep(0.5)
 
                     except Exception as e:
 
@@ -255,7 +255,7 @@ def process_orders(port, index_list, sendMail=True):
                             order = stop_order(quantity, StopPrice=round(trailStopPrice, 2))
 
                             app.add_order(contract, order)
-                            tps.sleep(1)
+                            tps.sleep(0.5)
 
                     except:
                         pass
@@ -299,7 +299,7 @@ def process_orders(port, index_list, sendMail=True):
                                                             trailPercent=trailPercent)
                         order.outsideRth = True
                         app.add_order(contract, order)
-                        tps.sleep(1)
+                        tps.sleep(0.5)
 
                     except:
                         pass
@@ -332,7 +332,7 @@ def process_orders(port, index_list, sendMail=True):
                             order = buy_order(quantity)
                             order.outsideRth = True
                             app.add_order(contract, order)
-                            tps.sleep(1)
+                            tps.sleep(0.5)
                     except:
                         pass
 
