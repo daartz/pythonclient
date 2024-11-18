@@ -225,7 +225,7 @@ def process_orders(port, index_list, sendMail=True):
 
                         pass
 
-                elif order_type == "HOLD":
+                elif order_type == "HOLD" and hour > 22:
 
                     try:
 
