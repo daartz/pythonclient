@@ -16,7 +16,7 @@ port_list = [port_perso_prod(), port_pro_prod(), port_perso_test()]
 
 # index_pro = ['USX','EUROX','US IPO','US9A', 'US9B', 'US9C','CANADA', 'ITALY','SPAIN','BELGIUM','GERMANY','NDL','FRANCE','EUROFRANCE']
 # index_pro = ['US','EUROPE',"CANADA","US IPO"]
-index_pro = ["US9A", "US9B", "US9C","CANADA", "US IPO"]
+index_pro = ["US", "CANADA", "US IPO"]
 index_pro_2 = ["CANADA", "US IPO"]
 # index_perso = ['US9', 'ITALY','SPAIN','BELGIUM']
 index_test = ["CANADA", "US IPO","US9A", "US9B", "US9C", "US", "EUROPE"]
