@@ -54,7 +54,7 @@ for port in port_list:
         threads.append(open_order_thread)
 
     else:
-        if 15 < hour < 21:
+        if hour < 21:
             print("TEST" + str(hour))
             open_order_thread = threading.Thread(target=process_reel_order, args=(port, index_test, True,))
             open_order_thread.start()

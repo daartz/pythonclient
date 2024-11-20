@@ -26,7 +26,12 @@ tps.sleep(3)
 
 data = pd.read_csv("C:\\TWS API\\source\\pythonclient\\tests\\Data\\positions.csv", index_col=0)
 
-orders = ['buy', 'sell', 'hold']
+if PORT == '4002':
+
+    orders = ['vad buy', 'vad sell']
+else:
+
+    orders = ['buy', 'sell', 'hold']
 
 for country in index:
     print(country)
@@ -147,30 +152,30 @@ for country in index:
                 except Exception as e:
                     print("Error:", e)
 
-            # elif order_type == "HOLD" and actual_percent > 2 :
-            #     try:
-            #         if app.find_position(stock):
-            #
-            #             app.reqOpenOrders()
-            #             tps.sleep(1)
-            #
-            #             orderId_list = app.orderId_present(stock, "SELL", currency=currency)
-            #
-            #             if len(orderId_list) != 0:
-            #                 for num in orderId_list:
-            #                     app.cancelOrder(num, manualCancelOrderTime=formatted_cancel_time)
-            #                     tps.sleep(0.30)
-            #
-            #                 quantity = data[stock]['Quantity']
-            #                 trailPercent = 2
-            #                 trailAmt = round(price * trailPercent / 100, 2)
-            #                 order = app.trailing_stop_order(quantity, trailStopPrice=row['SELL'], trailAmt=trailAmt,
-            #                                                 trailPercent=trailPercent)
-            #
-            #                 app.add_order(contract, order)
-            #                 tps.sleep(2)
-            #             else:
-            #                 print("OrderId is empty")
+            elif order_type == "HOLD" :
+                try:
+                    if app.find_position(stock):
+
+                        app.reqOpenOrders()
+                        tps.sleep(1)
+
+                        orderId_list = app.orderId_present(stock, "SELL", currency=currency)
+
+                        if len(orderId_list) != 0:
+                            for num in orderId_list:
+                                app.cancelOrder(num, manualCancelOrderTime=formatted_cancel_time)
+                                tps.sleep(0.30)
+
+                            quantity = data[stock]['Quantity']
+                            trailPercent = 2
+                            trailAmt = round(price * trailPercent / 100, 2)
+                            order = app.trailing_stop_order(quantity, trailStopPrice=row['SELL'], trailAmt=trailAmt,
+                                                            trailPercent=trailPercent)
+
+                            app.add_order(contract, order)
+                            tps.sleep(2)
+                        else:
+                            print("OrderId is empty")
 
                 except Exception as e:
                     print("Error:", e)
