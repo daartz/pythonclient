@@ -39,7 +39,8 @@ def process_orders(port, index_list, sendMail=True):
     orders = []
 
     if port in (4001, 5001):
-        orders = ['sell', 'buy','hold']
+        # orders = ['sell', 'buy','hold']
+        orders = ['sell', 'hold']
     elif port == 4002:
         orders = ['vad sell', 'vad buy','vad hold']
 
@@ -225,7 +226,7 @@ def process_orders(port, index_list, sendMail=True):
 
                         pass
 
-                elif order_type == "HOLD" and hour > 22:
+                elif order_type == "HOLD" and 15 < hour < 22:
 
                     try:
 
