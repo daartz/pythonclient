@@ -38,10 +38,10 @@ def process_orders(port, index_list, sendMail=True):
     stop_loss = 0
     orders = []
 
-    if port in (4001, 5001):
+    if port in [4001, 5001]:
         # orders = ['sell', 'buy','hold']
-        orders = ['sell', 'hold']
-    elif port == 4002:
+        orders = ['sell','hold']
+    elif port in [4002]:
         orders = ['vad sell', 'vad buy','vad hold']
 
     for country in index:
@@ -226,7 +226,7 @@ def process_orders(port, index_list, sendMail=True):
 
                         pass
 
-                elif order_type == "HOLD" and 15 < hour < 22:
+                elif order_type == "HOLD" and (10 > hour or hour > 22):
 
                     try:
 
@@ -334,6 +334,41 @@ def process_orders(port, index_list, sendMail=True):
                             order.outsideRth = True
                             app.add_order(contract, order)
                             tps.sleep(0.5)
+                    except:
+                        pass
+
+                elif order_type == "VAD HOLD" and (10 > hour or hour > 22):
+
+                    try:
+
+                        if app.find_position(stock):
+
+                            orderId_list = app.orderId_present(stock, "SELL", currency=currency)
+
+                            if orderId_list:
+                                try:
+                                    for num in orderId_list:
+                                        app.cancelOrder(num)
+                                        tps.sleep(1)
+
+                                except Exception as e:
+                                    print(e)
+
+                            else:
+
+                                print("OrderId is empty")
+
+                            quantity = abs(app.getPosition(stock))
+                            print(quantity)
+
+                            trailStopPrice = float(row['SL'])
+                            print(row['SL'])
+
+                            order = stop_order(quantity, StopPrice=round(trailStopPrice, 2), action="BUY")
+
+                            app.add_order(contract, order)
+                            tps.sleep(0.5)
+
                     except:
                         pass
 
