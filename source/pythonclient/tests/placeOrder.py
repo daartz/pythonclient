@@ -5,6 +5,7 @@ import time
 from datetime import datetime, timedelta
 import csv
 from send_mail import *
+import math
 
 
 def install_package(package):
@@ -497,3 +498,10 @@ class TradingApp(EWrapper, EClient):
     #     print("Error: ", reqId, " ", errorCode, " ", errorString)
     #     if advancedOrderRejectJson:
     #         print("Advanced order rejection info:", advancedOrderRejectJson)
+
+def centieme(val):
+    # Valeur initiale
+    valeur = val
+
+    # Arrondi au centième supérieur
+    return math.ceil(valeur * 20) / 20

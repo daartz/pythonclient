@@ -35,14 +35,15 @@ def process_orders(port, index_list, sendMail=True):
     data = pd.read_csv(file, index_col=0)
 
     index = index_list
-    stop_loss = 0
+
     orders = []
 
-    if port in [4001, 5001]:
+    if port in [4001,5001]:
         # orders = ['sell', 'buy','hold']
-        orders = ['sell','hold']
+        orders = ['sell', 'hold']
     elif port in [4002]:
-        orders = ['vad sell', 'vad buy','vad hold']
+        # pass
+        orders = ['vad sell', 'vad buy', 'vad hold']
 
     for country in index:
         print(country)
@@ -88,14 +89,13 @@ def process_orders(port, index_list, sendMail=True):
                 stock = row['STOCK'].split('.')[0]
                 secType = "STK"
                 exchange = "SMART"
+                stop_lopp_price = centieme(float(row['SL']))
+                trailPercent = centieme(float(row['SL %']))
 
-                trailPercent = 5
                 valq = 0
 
                 if "US" in country:
                     currency = "USD"
-                    trailPercent = 8
-
                     if port in [4001]:
                         valq += 500
                     else:
@@ -103,8 +103,6 @@ def process_orders(port, index_list, sendMail=True):
 
                 elif "CANADA" in country:
                     currency = "CAD"
-                    trailPercent = 7
-
                     if port in [4001]:
                         valq += 600
                     else:
@@ -112,7 +110,6 @@ def process_orders(port, index_list, sendMail=True):
                 else:
                     currency = "EUR"
                     valq += 1200
-                    trailPercent = 5
 
                 order_type = row['ORDER']
 
@@ -158,12 +155,9 @@ def process_orders(port, index_list, sendMail=True):
                         # order.outsideRth = True
                         app.add_order(contract, order)
 
-                        trailAmt = round(price * trailPercent / 100, 2)
-                        trailStopPrice = round(price - trailAmt, 2)
-                        trailStopPrice = row['SL']
+                        trailAmt = price - stop_lopp_price
 
-                        # Pour US, stop price de -6%
-                        # Pour Canada, Europe, trailing stop de 4%
+                        trailStopPrice = stop_lopp_price
 
                         if "US" in country or "CANADA" in country:
 
@@ -205,11 +199,7 @@ def process_orders(port, index_list, sendMail=True):
                             quantity = app.getPosition(stock)
                             print(quantity)
 
-                            # trailPercent = 0.05
 
-                            # trailAmt = round(price * trailPercent / 100, 2)
-
-                            # trailStopPrice = round(price - trailAmt,2)
 
                             # order = app.trailing_stop_order(quantity, trailStopPrice=trailStopPrice, trailAmt=trailAmt,
 
@@ -223,7 +213,7 @@ def process_orders(port, index_list, sendMail=True):
                             tps.sleep(0.5)
 
                     except Exception as e:
-
+                        print(e)
                         pass
 
                 elif order_type == "HOLD" and (10 > hour or hour > 22):
@@ -250,8 +240,7 @@ def process_orders(port, index_list, sendMail=True):
                             quantity = app.getPosition(stock)
                             print(quantity)
 
-                            trailStopPrice = float(row['SL'])
-                            print(row['SL'])
+                            trailStopPrice = stop_lopp_price
 
                             order = stop_order(quantity, StopPrice=round(trailStopPrice, 2))
 
@@ -285,11 +274,9 @@ def process_orders(port, index_list, sendMail=True):
                         app.add_order(contract, order)
 
                         # Calculer le trailing stop pour protéger la position
-                        trailAmt = round(price * trailPercent / 100, 2)
-                        # trailStopPrice = round(price + trailAmt, 2)  # Inverser le sens pour une vente à découvert
-                        trailStopPrice = data['SL']
-                        # Pour US et CANADA, stop price de +5% pour la vente à découvert
-                        # Pour Europe, trailing stop de 4%
+                        trailAmt = price - stop_lopp_price
+
+                        trailStopPrice = stop_lopp_price
 
                         if "US" in country or "CANADA" in country:
                             order = stop_order(quantity, StopPrice=round(trailStopPrice, 2), action="BUY")
@@ -361,8 +348,7 @@ def process_orders(port, index_list, sendMail=True):
                             quantity = abs(app.getPosition(stock))
                             print(quantity)
 
-                            trailStopPrice = float(row['SL'])
-                            print(row['SL'])
+                            trailStopPrice = stop_lopp_price
 
                             order = stop_order(quantity, StopPrice=round(trailStopPrice, 2), action="BUY")
 
