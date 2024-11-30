@@ -36,11 +36,21 @@ def process_orders(port, index_list, sendMail=True):
 
     index = index_list
 
+    nb_stock = data['Stock'].count()
+    print("(" + str(port) + ") Nb stocks: " + str(nb_stock))
+
+    max_stock = 500
+
+    if port == 4001:
+        max_stock = 180
+    elif port == 5001:
+        max_stock = 350
+
     orders = []
 
-    if port in [4001,5001]:
+    if port in [4001, 5001]:
         # orders = ['sell', 'buy','hold']
-        orders = ['sell', 'hold']
+        orders = ['sell', 'buy','hold']
     elif port in [4002]:
         # pass
         orders = ['vad sell', 'vad buy', 'vad hold']
@@ -132,6 +142,10 @@ def process_orders(port, index_list, sendMail=True):
 
                 if order_type == "BUY":
 
+                    if nb_stock > max_stock:
+                        print("Maximum number of stocks reached")
+                        continue
+
                     if row["SCORE"] < 5:
                         print("Score inférieur à 5")
                         continue
@@ -172,6 +186,8 @@ def process_orders(port, index_list, sendMail=True):
                         app.add_order(contract, order)
                         tps.sleep(0.5)
 
+                        nb_stock +=1
+
                     except:
                         pass
 
@@ -198,8 +214,6 @@ def process_orders(port, index_list, sendMail=True):
 
                             quantity = app.getPosition(stock)
                             print(quantity)
-
-
 
                             # order = app.trailing_stop_order(quantity, trailStopPrice=trailStopPrice, trailAmt=trailAmt,
 
