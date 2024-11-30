@@ -41,7 +41,6 @@ def process_orders(port, index_list, sendMail=True):
 
     max_stock = 500
 
-
     if port == 4001:
         max_stock = 180
     elif port == 5001:
@@ -339,8 +338,8 @@ def process_orders(port, index_list, sendMail=True):
                     except:
                         pass
 
-                # elif order_type == "VAD HOLD" and (10 > hour or hour > 22):
-                elif order_type == "VAD HOLD":
+                elif order_type == "VAD HOLD" and (10 > hour or hour > 22):
+                # elif order_type == "VAD HOLD":
                     try:
 
                         if app.find_position(stock):
@@ -363,7 +362,7 @@ def process_orders(port, index_list, sendMail=True):
                             quantity = abs(app.getPosition(stock))
                             print(quantity)
 
-                            trailStopPrice = stop_lopp_price
+                            trailStopPrice = centieme(stop_lopp_price)
 
                             order = stop_order(quantity, StopPrice=round(trailStopPrice, 2), action="BUY")
 
