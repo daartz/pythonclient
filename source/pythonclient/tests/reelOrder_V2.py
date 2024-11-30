@@ -41,6 +41,7 @@ def process_orders(port, index_list, sendMail=True):
 
     max_stock = 500
 
+
     if port == 4001:
         max_stock = 180
     elif port == 5001:
@@ -338,13 +339,13 @@ def process_orders(port, index_list, sendMail=True):
                     except:
                         pass
 
-                elif order_type == "VAD HOLD" and (10 > hour or hour > 22):
-
+                # elif order_type == "VAD HOLD" and (10 > hour or hour > 22):
+                elif order_type == "VAD HOLD":
                     try:
 
                         if app.find_position(stock):
 
-                            orderId_list = app.orderId_present(stock, "SELL", currency=currency)
+                            orderId_list = app.orderId_present(stock, "BUY", currency=currency)
 
                             if orderId_list:
                                 try:
