@@ -140,7 +140,10 @@ class TestApp(EWrapper, EClient):
 
         try:
             data = pd.DataFrame(self.porfolio)
-            nb = data["Symbol"].count()
+            df = data[data['UnrealizedPNL'] != 0.0]
+            nb = df["Symbol"].count()
+            df = data[data['RealizedPNL'] != 0.0]
+            nb2 = df["Symbol"].count()
             mktValue = round(data["MarketValue"].sum(), 2)
             unrpnl = round(data["UnrealizedPNL"].sum(), 2)
             txUnrpnl =round(((unrpnl/mktValue)) *100,2)
@@ -149,10 +152,11 @@ class TestApp(EWrapper, EClient):
             data.to_csv(portfolio_file, index=False)
 
             if self.send_email:
-                html_data = '<p>(TWS) Portfolio : ' + self.accountName[0] + ' </p><p>Nb of Stocks : ' + str(nb) \
+                html_data = '<p>(TWS) Portfolio : ' + self.accountName[0] + ' </p><p>Nb of Stocks (URLZ): ' + str(nb) \
                             + ' </p><p>Market Value : ' + str(mktValue)  \
                             + '</p><p>Unrealized PNL : ' + \
-                            str(unrpnl) + ' ('+ str(txUnrpnl)+' %)'+ '</p><p>Realized PNL : ' + str(rpnl) + '</p>' + data.to_html()
+                            str(unrpnl) + ' ('+ str(txUnrpnl)+' %)' + ' </p><p>Nb of Stocks (RLZ): ' + str(nb2) \
+                            + '</p><p>Realized PNL : ' + str(rpnl) + '</p>' + data.to_html()
                 send_mail_html("IBKR TWS Portfolio " + self.accountName[0], html_data)
 
         except:

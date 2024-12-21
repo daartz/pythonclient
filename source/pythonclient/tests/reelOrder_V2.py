@@ -36,15 +36,16 @@ def process_orders(port, index_list, sendMail=True):
 
     index = index_list
 
-    nb_stock = data['Stock'].count()
+    df = data[data['UnrealizedPNL'] != 0.0]
+    nb_stock = df['Stock'].count()
     print("(" + str(port) + ") Nb stocks: " + str(nb_stock))
 
     max_stock = 500
 
     if port == 4001:
-        max_stock = 180
+        max_stock = 150
     elif port == 5001:
-        max_stock = 350
+        max_stock = 300
 
     orders = []
 
@@ -107,16 +108,16 @@ def process_orders(port, index_list, sendMail=True):
                 if "US" in country:
                     currency = "USD"
                     if port in [4001]:
-                        valq += 500
+                        valq += 400
                     else:
-                        valq += 550
+                        valq += 400
 
                 elif "CANADA" in country:
                     currency = "CAD"
                     if port in [4001]:
-                        valq += 600
+                        valq += 450
                     else:
-                        valq += 650
+                        valq += 450
                 else:
                     currency = "EUR"
                     valq += 1200
