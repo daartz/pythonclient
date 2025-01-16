@@ -156,7 +156,7 @@ class TestApp(EWrapper, EClient):
                             + ' </p><p>Market Value : ' + str(mktValue)  \
                             + '</p><p>Unrealized PNL : ' + \
                             str(unrpnl) + ' ('+ str(txUnrpnl)+' %)' + ' </p><p>Nb of Stocks (RLZ): ' + str(nb2) \
-                            + '</p><p>Realized PNL : ' + str(rpnl) + '</p>' + data.to_html()
+                            + '</p><p>Realized PNL : ' + str(rpnl) + '</p>' + data.to_html(index=False)
                 send_mail_html("IBKR TWS Portfolio " + self.accountName[0], html_data)
 
         except:

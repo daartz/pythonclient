@@ -51,7 +51,7 @@ def process_orders(port, index_list, sendMail=True):
 
     if port in [4001, 5001]:
         # orders = ['sell', 'buy','hold']
-        orders = ['sell', 'buy','hold']
+        orders = ['sell', 'hold']
     elif port in [4002]:
         # pass
         orders = ['vad sell', 'vad buy', 'vad hold']
@@ -223,7 +223,7 @@ def process_orders(port, index_list, sendMail=True):
                             tps.sleep(0.5)
 
                             order = app.sell_order(quantity)
-                            order.outsideRth = True
+                            order.outsideRth = False
                             app.add_order(contract, order)
                             tps.sleep(0.5)
 
@@ -231,7 +231,7 @@ def process_orders(port, index_list, sendMail=True):
                         print(e)
                         pass
 
-                elif order_type == "HOLD" and (10 > hour or hour > 22):
+                elif order_type == "HOLD" and (12 >= hour or hour >= 22):
 
                     try:
 
@@ -285,7 +285,7 @@ def process_orders(port, index_list, sendMail=True):
 
                         # Placer l'ordre de vente à découvert
                         order = sell_short_order(quantity)  # Utiliser une fonction spécifique pour la vente à découvert
-                        order.outsideRth = True
+                        order.outsideRth = False
                         app.add_order(contract, order)
 
                         # Calculer le trailing stop pour protéger la position
@@ -300,7 +300,7 @@ def process_orders(port, index_list, sendMail=True):
                             order = app.trailing_stop_order(quantity, action="BUY", trailStopPrice=trailStopPrice,
                                                             trailAmt=trailAmt,
                                                             trailPercent=trailPercent)
-                        order.outsideRth = True
+                        order.outsideRth = False
                         app.add_order(contract, order)
                         tps.sleep(0.5)
 
@@ -333,7 +333,7 @@ def process_orders(port, index_list, sendMail=True):
                             print(quantity)
                             # Placer l'ordre de rachat pour couvrir la vente à découvert
                             order = buy_order(quantity)
-                            order.outsideRth = True
+                            order.outsideRth = False
                             app.add_order(contract, order)
                             tps.sleep(0.5)
                     except:
