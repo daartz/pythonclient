@@ -5,6 +5,7 @@ from ibapi.contract import Contract
 from ibapi.wrapper import EWrapper
 from send_mail import *
 
+
 def index_suffix(symbol, exchange):
     exchange_suffix_mapping = {
         "AEB": ".AS",  # Amsterdam
@@ -23,12 +24,12 @@ def index_suffix(symbol, exchange):
         "AT": ".AT",  # Greece
         # "NYSE": ".NY",
         # "NASDAQ": ".OQ",
-        "LSE": ".L", # UK
+        "LSE": ".L",  # UK
         "SIX": ".SW",
-        "HKSE": ".HK", # HONG KONG
+        "HKSE": ".HK",  # HONG KONG
         # "TSX": ".TO",
-        "ASX": ".AX" , # AUSTRALIA
-        "TSE": ".TO", # CANADA
+        "ASX": ".AX",  # AUSTRALIA
+        "TSE": ".TO",  # CANADA
         "BSE": ".BO",
         # "NSE": ".NS",
         # Ajoutez d'autres échanges et leurs suffixes ici
@@ -37,9 +38,11 @@ def index_suffix(symbol, exchange):
     suffix = exchange_suffix_mapping.get(exchange, "")
     return f"{symbol}{suffix}"
 
+
 class TestApp(EWrapper, EClient):
-    def __init__(self, send_email=False):
+    def __init__(self, send_email=False, account_code=""):
         EClient.__init__(self, self)
+        self.account_code = account_code
         self.portfolio = {}
         self.accountName = []
         self.symbol = []
@@ -58,7 +61,7 @@ class TestApp(EWrapper, EClient):
         self.key = []
         self.val = []
         self.currency = []
-        self.conid =[]
+        self.conid = []
         self.accountname2 = []
         self.port_code = None  # New attribute to store the port code
         self.send_email = send_email
@@ -75,16 +78,14 @@ class TestApp(EWrapper, EClient):
         #       "Position:", position, "MarketPrice:", marketPrice, "MarketValue:", marketValue, "AverageCost:", averageCost,
         #       "UnrealizedPNL:", unrealizedPNL, "RealizedPNL:", realizedPNL, "AccountName:", accountName)
 
-
         try:
-            rate = ((marketPrice/averageCost)-1) *100
+            rate = ((marketPrice / averageCost) - 1) * 100
         except:
             rate = 0
 
-
         self.accountName.append(accountName)
         self.symbol.append(contract.symbol)
-        self.stock.append(index_suffix(contract.symbol,contract.primaryExchange))
+        self.stock.append(index_suffix(contract.symbol, contract.primaryExchange))
         self.sectype.append(contract.secType)
         self.exchange.append(contract.primaryExchange)
         # self.currency.append(contract.currency)
@@ -146,16 +147,16 @@ class TestApp(EWrapper, EClient):
             nb2 = df["Symbol"].count()
             mktValue = round(data["MarketValue"].sum(), 2)
             unrpnl = round(data["UnrealizedPNL"].sum(), 2)
-            txUnrpnl =round(((unrpnl/mktValue)) *100,2)
+            txUnrpnl = round(((unrpnl / mktValue)) * 100, 2)
             rpnl = round(data["RealizedPNL"].sum(), 2)
 
             data.to_csv(portfolio_file, index=False)
 
             if self.send_email:
                 html_data = '<p>(TWS) Portfolio : ' + self.accountName[0] + ' </p><p>Nb of Stocks (URLZ): ' + str(nb) \
-                            + ' </p><p>Market Value : ' + str(mktValue)  \
+                            + ' </p><p>Market Value : ' + str(mktValue) \
                             + '</p><p>Unrealized PNL : ' + \
-                            str(unrpnl) + ' ('+ str(txUnrpnl)+' %)' + ' </p><p>Nb of Stocks (RLZ): ' + str(nb2) \
+                            str(unrpnl) + ' (' + str(txUnrpnl) + ' %)' + ' </p><p>Nb of Stocks (RLZ): ' + str(nb2) \
                             + '</p><p>Realized PNL : ' + str(rpnl) + '</p>' + data.to_html(index=False)
                 send_mail_html("IBKR TWS Portfolio " + self.accountName[0], html_data)
 
@@ -189,7 +190,9 @@ class TestApp(EWrapper, EClient):
 
     def start(self):
         # Account number can be omitted when using reqAccountUpdates with single account structure
-        self.reqAccountUpdates(True, "")
+        if self.port == 4001:
+            self.account_code = "U11227042"
+        self.reqAccountUpdates(True, self.account_code)
         self.portfolio = {}
         # self.port_code = f"{self.host}_{self.port}"
         self.port_code = f"{self.port}"
@@ -200,8 +203,8 @@ class TestApp(EWrapper, EClient):
         self.disconnect()
 
 
-def main_portfolio(port, send_email=False):
-    app = TestApp(send_email)
+def main_portfolio(port, send_email=False, account_code=""):
+    app = TestApp(send_email, account_code)
     app.connect("127.0.0.1", port, 0)
 
     Timer(5, app.stop).start()
