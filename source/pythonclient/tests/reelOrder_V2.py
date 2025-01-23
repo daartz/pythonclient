@@ -1,5 +1,7 @@
 import time as tps
 
+import pandas as pd
+
 from marketHours import *
 from placeOrder import *
 from portfolio import *
@@ -10,7 +12,7 @@ def process_orders(port, index_list, sendMail=True):
     today = datetime.now().date()
     hour = datetime.now().hour
     minute = datetime.now().minute
-
+    multiple_levier = 4
     now = datetime.now()
     current_time = now.strftime("%H:%M")
 
@@ -30,6 +32,30 @@ def process_orders(port, index_list, sendMail=True):
     app.all_orderId()
     tps.sleep(5)
 
+    account_value_file = f"C:\\TWS API\\source\\pythonclient\\tests\\Data\\account_value_{port}.csv"
+    df = pd.read_csv(account_value_file)
+
+    result = df[(df["Key"] == "StockMarketValue") & (df["Currency"] == "BASE")]
+
+    stockMarketValue = float(result["Val"].iloc[0]) if not result.empty else None
+
+    print(f"({port}) StockMarketValue : " + str(stockMarketValue))
+
+    result = df[(df["Key"] == "NetLiquidation")]
+
+    netLiquidation = float(result["Val"].iloc[0]) if not result.empty else None
+
+    print(f"({port}) NetLiquidation : " + str(netLiquidation))
+
+    if port != 4002:
+        levier = round(stockMarketValue / netLiquidation, 2)
+
+        print(f"({port}) Levier : " + str(levier))
+
+        buyingPower = round((netLiquidation * multiple_levier) - stockMarketValue, 2)
+
+        print(f"({port}) BuyingPower : " + str(buyingPower))
+
     file = f"C:\\TWS API\\source\\pythonclient\\tests\\Data\\portfolio_{port}.csv"
 
     data = pd.read_csv(file, index_col=0)
@@ -38,7 +64,7 @@ def process_orders(port, index_list, sendMail=True):
 
     df = data[data['UnrealizedPNL'] != 0.0]
     nb_stock = df['Stock'].count()
-    print("(" + str(port) + ") Nb stocks: " + str(nb_stock))
+    print(f"({port}) Nb stocks: " + str(nb_stock))
 
     max_stock = 500
 
@@ -50,8 +76,10 @@ def process_orders(port, index_list, sendMail=True):
     orders = []
 
     if port in [4001, 5001]:
-        # orders = ['sell', 'buy','hold']
-        orders = ['sell', 'hold']
+        if levier <= multiple_levier:
+            orders = ['sell', 'buy', 'hold']
+        else:
+            orders = ['sell', 'hold']
     elif port in [4002]:
         # pass
         orders = ['vad sell', 'vad buy', 'vad hold']
@@ -143,6 +171,9 @@ def process_orders(port, index_list, sendMail=True):
 
                 if order_type == "BUY":
 
+                    if port != 4002 and buyingPower < 0:
+                        continue
+
                     if nb_stock > max_stock:
                         print("Maximum number of stocks reached")
                         continue
@@ -187,7 +218,8 @@ def process_orders(port, index_list, sendMail=True):
                         app.add_order(contract, order)
                         tps.sleep(0.5)
 
-                        nb_stock +=1
+                        nb_stock += 1
+                        buyingPower -= valq
 
                     except:
                         pass
@@ -340,7 +372,7 @@ def process_orders(port, index_list, sendMail=True):
                         pass
 
                 elif order_type == "VAD HOLD" and (10 > hour or hour > 22):
-                # elif order_type == "VAD HOLD":
+                    # elif order_type == "VAD HOLD":
                     try:
 
                         if app.find_position(stock):

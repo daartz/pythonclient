@@ -176,10 +176,11 @@ class TestApp(EWrapper, EClient):
             # self.accountvalue['AccountName']= self.accountname2
 
             data = pd.DataFrame(self.accountvalue)
+            data = data.sort_values(by="Key")
             data.to_csv(account_value_file, index=False)
 
             if self.send_email:
-                html_data = '<p>(TWS) Account Value : ' + self.accountname2[0] + '</p>' + data.to_html()
+                html_data = '<p>(TWS) Account Value : ' + self.accountname2[0] + '</p>' + data.to_html(index = False)
                 send_mail_html("IBKR TWS Account Value " + self.accountname2[0], html_data)
 
         except:
