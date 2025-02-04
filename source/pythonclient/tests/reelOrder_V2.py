@@ -9,6 +9,7 @@ from portfolio import *
 
 def process_orders(port, index_list, sendMail=True):
     # Current date in YYYY-MM-DD format
+    global levier
     today = datetime.now().date()
     hour = datetime.now().hour
     minute = datetime.now().minute
@@ -68,11 +69,14 @@ def process_orders(port, index_list, sendMail=True):
 
     max_stock = 500
 
+    ID_ACCOUNT = ""
+
     if port == 4001:
         max_stock = 150
+        ID_ACCOUNT = 'U11227042'
     elif port == 5001:
         max_stock = 300
-
+        ID_ACCOUNT = 'U16043850'
     orders = []
 
     if port in [4001, 5001]:
@@ -199,6 +203,7 @@ def process_orders(port, index_list, sendMail=True):
 
                         order = buy_order(quantity)
                         # order.outsideRth = True
+                        order.account = ID_ACCOUNT
                         app.add_order(contract, order)
 
                         trailAmt = price - stop_lopp_price
@@ -255,6 +260,7 @@ def process_orders(port, index_list, sendMail=True):
                             tps.sleep(0.5)
 
                             order = app.sell_order(quantity)
+                            order.account = ID_ACCOUNT
                             order.outsideRth = False
                             app.add_order(contract, order)
                             tps.sleep(0.5)
@@ -290,7 +296,7 @@ def process_orders(port, index_list, sendMail=True):
                             trailStopPrice = stop_lopp_price
 
                             order = stop_order(quantity, StopPrice=round(trailStopPrice, 2))
-
+                            order.account = ID_ACCOUNT
                             app.add_order(contract, order)
                             tps.sleep(0.5)
 
@@ -317,6 +323,7 @@ def process_orders(port, index_list, sendMail=True):
 
                         # Placer l'ordre de vente à découvert
                         order = sell_short_order(quantity)  # Utiliser une fonction spécifique pour la vente à découvert
+                        order.account = ID_ACCOUNT
                         order.outsideRth = False
                         app.add_order(contract, order)
 
@@ -366,6 +373,7 @@ def process_orders(port, index_list, sendMail=True):
                             # Placer l'ordre de rachat pour couvrir la vente à découvert
                             order = buy_order(quantity)
                             order.outsideRth = False
+                            order.account = ID_ACCOUNT
                             app.add_order(contract, order)
                             tps.sleep(0.5)
                     except:
@@ -398,7 +406,7 @@ def process_orders(port, index_list, sendMail=True):
                             trailStopPrice = centieme(stop_lopp_price)
 
                             order = stop_order(quantity, StopPrice=round(trailStopPrice, 2), action="BUY")
-
+                            order.account = ID_ACCOUNT
                             app.add_order(contract, order)
                             tps.sleep(0.5)
 
