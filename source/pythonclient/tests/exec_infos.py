@@ -7,7 +7,8 @@ from reelOrder_V2 import *
 
 import threading
 
-port_list = [port_perso_prod(), port_pro_prod(), port_perso_test()]
+# port_list = [port_perso_prod(), port_pro_prod(), port_perso_test()]
+port_list = [port_perso_prod(), port_pro_prod()]
 
 def process_portfolio(port_code):
     try:
@@ -15,6 +16,7 @@ def process_portfolio(port_code):
         if port_code ==4001:
             account_code = "U11227042"
         main_portfolio(port_code, send_email=True)
+
     except Exception as e:
         print(f"Error processing portfolio: {e}")
 

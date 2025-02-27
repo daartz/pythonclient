@@ -9,11 +9,11 @@ from portfolio import *
 
 def process_orders(port, index_list, sendMail=True):
     # Current date in YYYY-MM-DD format
-    global levier
+    global levier, buyingPower
     today = datetime.now().date()
     hour = datetime.now().hour
     minute = datetime.now().minute
-    multiple_levier = 4
+    multiple_levier = 5
     now = datetime.now()
     current_time = now.strftime("%H:%M")
 
@@ -81,9 +81,10 @@ def process_orders(port, index_list, sendMail=True):
 
     if port in [4001, 5001]:
         if levier <= multiple_levier:
-            orders = ['sell', 'buy', 'hold']
+            orders = ['sell', 'buy']
         else:
-            orders = ['sell', 'hold']
+            print("*** LEVIER DEPASSE ***")
+            orders = ['sell']
     elif port in [4002]:
         # pass
         orders = ['vad sell', 'vad buy', 'vad hold']
@@ -132,7 +133,7 @@ def process_orders(port, index_list, sendMail=True):
                 stock = row['STOCK'].split('.')[0]
                 secType = "STK"
                 exchange = "SMART"
-                stop_lopp_price = centieme(float(row['SL']))
+                stop_loss_price = centieme(float(row['SL']))
                 trailPercent = centieme(float(row['SL %']))
 
                 valq = 0
@@ -174,6 +175,8 @@ def process_orders(port, index_list, sendMail=True):
                 contract = app.create_contract(stock, secType, exchange, currency)
 
                 if order_type == "BUY":
+                    if "US" in country and hour < 20:
+                        continue
 
                     if port != 4002 and buyingPower < 0:
                         continue
@@ -206,21 +209,19 @@ def process_orders(port, index_list, sendMail=True):
                         order.account = ID_ACCOUNT
                         app.add_order(contract, order)
 
-                        trailAmt = price - stop_lopp_price
+                        stop_loss_price = centieme(price * 0.90)  # 90% du prix d'achat
+                        stop_order_pnl = stop_order(quantity, StopPrice=stop_loss_price, action="SELL")
+                        stop_order_pnl.account = ID_ACCOUNT
+                        app.add_order(contract, stop_order_pnl)
 
-                        trailStopPrice = stop_lopp_price
+                        # trailAmt = price - stop_loss_price
+                        #
+                        # trailStopPrice = stop_loss_price
+                        # order = app.trailing_stop_order(quantity, action="SELL", trailStopPrice=trailStopPrice,
+                        #                                     trailAmt=trailAmt, trailPercent=trailPercent)
+                        # # order.outsideRth = True
+                        # app.add_order(contract, order)
 
-                        if "US" in country or "CANADA" in country:
-
-                            order = stop_order(quantity, StopPrice=round(trailStopPrice, 2))
-
-                        else:
-
-                            order = app.trailing_stop_order(quantity, action="SELL", trailStopPrice=trailStopPrice,
-                                                            trailAmt=trailAmt,
-                                                            trailPercent=trailPercent)
-                        # order.outsideRth = True
-                        app.add_order(contract, order)
                         tps.sleep(0.5)
 
                         nb_stock += 1
@@ -269,39 +270,39 @@ def process_orders(port, index_list, sendMail=True):
                         print(e)
                         pass
 
-                elif order_type == "HOLD" and (12 >= hour or hour >= 22):
-
-                    try:
-
-                        if app.find_position(stock):
-
-                            orderId_list = app.orderId_present(stock, "SELL", currency=currency)
-
-                            if orderId_list:
-                                try:
-                                    for num in orderId_list:
-                                        app.cancelOrder(num)
-                                        tps.sleep(1)
-
-                                except Exception as e:
-                                    print(e)
-
-                            else:
-
-                                print("OrderId is empty")
-
-                            quantity = app.getPosition(stock)
-                            print(quantity)
-
-                            trailStopPrice = stop_lopp_price
-
-                            order = stop_order(quantity, StopPrice=round(trailStopPrice, 2))
-                            order.account = ID_ACCOUNT
-                            app.add_order(contract, order)
-                            tps.sleep(0.5)
-
-                    except:
-                        pass
+                # elif order_type == "HOLD" and (12 >= hour or hour >= 22):
+                #
+                #     try:
+                #
+                #         if app.find_position(stock):
+                #
+                #             orderId_list = app.orderId_present(stock, "SELL", currency=currency)
+                #
+                #             if orderId_list:
+                #                 try:
+                #                     for num in orderId_list:
+                #                         app.cancelOrder(num)
+                #                         tps.sleep(1)
+                #
+                #                 except Exception as e:
+                #                     print(e)
+                #
+                #             else:
+                #
+                #                 print("OrderId is empty")
+                #
+                #             quantity = app.getPosition(stock)
+                #             print(quantity)
+                #
+                #             trailStopPrice = stop_loss_price
+                #
+                #             order = stop_order(quantity, StopPrice=round(trailStopPrice, 2))
+                #             order.account = ID_ACCOUNT
+                #             app.add_order(contract, order)
+                #             tps.sleep(0.5)
+                #
+                #     except:
+                #         pass
 
                 elif order_type == "VAD SELL":  # Vente à découvert
 
@@ -328,9 +329,9 @@ def process_orders(port, index_list, sendMail=True):
                         app.add_order(contract, order)
 
                         # Calculer le trailing stop pour protéger la position
-                        trailAmt = price - stop_lopp_price
+                        trailAmt = price - stop_loss_price
 
-                        trailStopPrice = stop_lopp_price
+                        trailStopPrice = stop_loss_price
 
                         if "US" in country or "CANADA" in country:
                             order = stop_order(quantity, StopPrice=round(trailStopPrice, 2), action="BUY")
@@ -403,7 +404,7 @@ def process_orders(port, index_list, sendMail=True):
                             quantity = abs(app.getPosition(stock))
                             print(quantity)
 
-                            trailStopPrice = centieme(stop_lopp_price)
+                            trailStopPrice = centieme(stop_loss_price)
 
                             order = stop_order(quantity, StopPrice=round(trailStopPrice, 2), action="BUY")
                             order.account = ID_ACCOUNT
