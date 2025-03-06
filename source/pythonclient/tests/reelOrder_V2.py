@@ -153,7 +153,7 @@ def process_orders(port, index_list, sendMail=True):
                         valq += 450
                 else:
                     currency = "EUR"
-                    valq += 1200
+                    valq += 400
 
                 order_type = row['ORDER']
 
@@ -175,8 +175,10 @@ def process_orders(port, index_list, sendMail=True):
                 contract = app.create_contract(stock, secType, exchange, currency)
 
                 if order_type == "BUY":
-                    if "US" in country and hour < 18:
+                    if ("US" or "CANADA") in country and hour < 19:
                         continue
+                    # if "EURO" in country and hour < 15:
+                    #     continue
 
                     if port != 4002 and buyingPower < 0:
                         continue
