@@ -130,7 +130,11 @@ def process_orders(port, index_list, sendMail=True):
                     row['BUY']) + ' - ' + str(
                     row['DATE']) + '   ****')
 
-                stock = row['STOCK'].split('.')[0]
+                stock = row['STOCK']
+
+                if "." in stock:
+                    stock = '.'.join(row['STOCK'].split('.')[:-1])
+
                 secType = "STK"
                 exchange = "SMART"
                 stop_loss_price = centieme(float(row['SL']))
@@ -175,10 +179,10 @@ def process_orders(port, index_list, sendMail=True):
                 contract = app.create_contract(stock, secType, exchange, currency)
 
                 if order_type == "BUY":
-                    if ("US" or "CANADA") in country and hour < 19:
+                    if ("US" or "CANADA") in country and hour < 17:
                         continue
-                    # if "EURO" in country and hour < 15:
-                    #     continue
+                    if "EURO" in country and hour < 10:
+                        continue
 
                     if port != 4002 and buyingPower < 0:
                         continue
@@ -233,6 +237,11 @@ def process_orders(port, index_list, sendMail=True):
                         pass
 
                 elif order_type == "SELL":
+
+                    if ("US" or "CANADA") in country and hour < 16:
+                        continue
+                    if "EURO" in country and hour < 10:
+                        continue
 
                     try:
 

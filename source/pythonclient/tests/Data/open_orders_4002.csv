@@ -1,7 +1,1 @@
 index,orderId,symbol,secType,currency,action,orderType,totalQty,lmtPrice,auxPrice,status
-1,12079,TSU,STK,CAD,BUY,STP,13.0,0.0,38.85,PreSubmitted
-2,12077,FRU,STK,CAD,BUY,STP,35.0,0.0,13.35,PreSubmitted
-3,12081,WPK,STK,CAD,BUY,STP,10.0,0.0,48.35,PreSubmitted
-4,12079,TSU,STK,CAD,BUY,STP,13.0,0.0,38.85,PreSubmitted
-5,12077,FRU,STK,CAD,BUY,STP,35.0,0.0,13.35,PreSubmitted
-6,12081,WPK,STK,CAD,BUY,STP,10.0,0.0,48.35,PreSubmitted
