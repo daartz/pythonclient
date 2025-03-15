@@ -179,7 +179,7 @@ def process_orders(port, index_list, sendMail=True):
                 contract = app.create_contract(stock, secType, exchange, currency)
 
                 if order_type == "BUY":
-                    if ("US" or "CANADA") in country and hour < 17:
+                    if ("US" or "CANADA") in country and hour < 16:
                         continue
                     if "EURO" in country and hour < 10:
                         continue
