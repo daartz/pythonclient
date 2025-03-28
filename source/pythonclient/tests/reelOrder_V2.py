@@ -79,9 +79,15 @@ def process_orders(port, index_list, sendMail=True):
         ID_ACCOUNT = 'U16043850'
     orders = []
 
-    if port in [4001, 5001]:
+    if port in [5001]:
         if levier <= multiple_levier:
             orders = ['sell', 'buy']
+        else:
+            print("*** LEVIER DEPASSE ***")
+            orders = ['sell']
+    elif port in [4001]:
+        if levier <= multiple_levier:
+            orders = ['sell','buy']
         else:
             print("*** LEVIER DEPASSE ***")
             orders = ['sell']
@@ -185,13 +191,14 @@ def process_orders(port, index_list, sendMail=True):
                         continue
 
                     if port != 4002 and buyingPower < 0:
+                        print("BuyingPower < 0")
                         continue
 
                     if nb_stock > max_stock:
                         print("Maximum number of stocks reached")
                         continue
 
-                    if row["SCORE"] < 5:
+                    if row["SCORE"] < 4:
                         print("Score inférieur à 5")
                         continue
 
@@ -324,11 +331,12 @@ def process_orders(port, index_list, sendMail=True):
                     try:
                         # Vérifier si une position courte existe déjà pour l'action
                         if app.find_position_vad(stock, position_type="SELL"):
+                            print(app.find_position_vad(stock, position_type="SELL"))
                             continue
 
                         tps.sleep(1)
 
-                        orderId_list = app.orderId_present(stock, "SELL_SHORT", currency=currency)
+                        orderId_list = app.orderId_present(stock, "SELL", currency=currency)
 
                         if len(orderId_list) != 0:
                             continue
