@@ -7,8 +7,8 @@ from reelOrder_V2 import *
 
 import threading
 
-port_list = [port_perso_prod(), port_pro_prod(), port_perso_test()]
-# port_list = [port_perso_prod(), port_pro_prod()]
+# port_list = [port_perso_prod(), port_pro_prod(), port_perso_test()]
+port_list = [port_perso_prod(), port_pro_prod()]
 
 def process_portfolio(port_code):
     try:

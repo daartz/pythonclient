@@ -81,19 +81,19 @@ def process_orders(port, index_list, sendMail=True):
 
     if port in [5001]:
         if levier <= multiple_levier:
+            orders = ['sell', 'buy','vad sell', 'vad buy']
+        else:
+            print("*** LEVIER DEPASSE ***")
+            orders = ['sell','vad buy']
+    elif port in [4001]:
+        if levier <= multiple_levier:
             orders = ['sell', 'buy']
         else:
             print("*** LEVIER DEPASSE ***")
             orders = ['sell']
-    elif port in [4001]:
-        if levier <= multiple_levier:
-            orders = ['sell','buy']
-        else:
-            print("*** LEVIER DEPASSE ***")
-            orders = ['sell']
     elif port in [4002]:
-        # pass
-        orders = ['vad sell', 'vad buy', 'vad hold']
+        pass
+        # orders = ['vad sell', 'vad buy']
 
     for country in index:
         print(country)
@@ -328,10 +328,19 @@ def process_orders(port, index_list, sendMail=True):
                         print("0 stock")
                         continue
 
+                    if port in ['5001', '4001'] and row['MARKET'] not in ['DJI','SP500','CANADA','NASDAQ']:
+                        continue
+
+                    if ("US" or "CANADA") in country and hour < 16:
+                        continue
+                    if "EURO" in country and hour < 10:
+                        continue
+
                     try:
                         # Vérifier si une position courte existe déjà pour l'action
-                        if app.find_position_vad(stock, position_type="SELL"):
-                            print(app.find_position_vad(stock, position_type="SELL"))
+                        # if app.find_position_vad(stock, position_type="SELL"):
+                        if app.find_position(stock):
+                            print("Position present ? " + str(app.find_position(stock)))
                             continue
 
                         tps.sleep(1)
@@ -368,12 +377,23 @@ def process_orders(port, index_list, sendMail=True):
 
                 elif order_type == "VAD BUY":  # Couvrir une position short
 
+                    if port in ['5001','4001'] and row['MARKET'] not in ['DJI','SP500','CANADA','NASDAQ']:
+                        continue
+
+                    if ("US" or "CANADA") in country and hour < 16:
+                        continue
+                    if "EURO" in country and hour < 10:
+                        continue
+
                     try:
                         # Vérifier si une position short existe
                         if app.find_position_vad(stock, position_type="SELL"):
+                            print("SELL position present ? " + str(app.find_position_vad(stock, position_type="SELL")))
 
+                            # Vérifier si un ordre BUY exite
                             orderId_list = app.orderId_present(stock, "BUY", currency=currency)
 
+                            # Si oui >> annuler l'ordre BUY
                             if len(orderId_list) != 0:
                                 try:
                                     for num in orderId_list:
@@ -385,7 +405,7 @@ def process_orders(port, index_list, sendMail=True):
 
                             else:
                                 print("OrderId is empty")
-                            #
+
                             quantity = abs(app.getPosition(stock))  # Quantité pour couvrir la position short
                             tps.sleep(1)
 
@@ -399,39 +419,39 @@ def process_orders(port, index_list, sendMail=True):
                     except:
                         pass
 
-                elif order_type == "VAD HOLD" and (10 > hour or hour > 22):
-                    # elif order_type == "VAD HOLD":
-                    try:
-
-                        if app.find_position(stock):
-
-                            orderId_list = app.orderId_present(stock, "BUY", currency=currency)
-
-                            if orderId_list:
-                                try:
-                                    for num in orderId_list:
-                                        app.cancelOrder(num)
-                                        tps.sleep(1)
-
-                                except Exception as e:
-                                    print(e)
-
-                            else:
-
-                                print("OrderId is empty")
-
-                            quantity = abs(app.getPosition(stock))
-                            print(quantity)
-
-                            trailStopPrice = centieme(stop_loss_price)
-
-                            order = stop_order(quantity, StopPrice=round(trailStopPrice, 2), action="BUY")
-                            order.account = ID_ACCOUNT
-                            app.add_order(contract, order)
-                            tps.sleep(0.5)
-
-                    except:
-                        pass
+                # elif order_type == "VAD HOLD" and (10 > hour or hour > 22):
+                #     # elif order_type == "VAD HOLD":
+                #     try:
+                #
+                #         if app.find_position(stock):
+                #
+                #             orderId_list = app.orderId_present(stock, "BUY", currency=currency)
+                #
+                #             if orderId_list:
+                #                 try:
+                #                     for num in orderId_list:
+                #                         app.cancelOrder(num)
+                #                         tps.sleep(1)
+                #
+                #                 except Exception as e:
+                #                     print(e)
+                #
+                #             else:
+                #
+                #                 print("OrderId is empty")
+                #
+                #             quantity = abs(app.getPosition(stock))
+                #             print(quantity)
+                #
+                #             trailStopPrice = centieme(stop_loss_price)
+                #
+                #             order = stop_order(quantity, StopPrice=round(trailStopPrice, 2), action="BUY")
+                #             order.account = ID_ACCOUNT
+                #             app.add_order(contract, order)
+                #             tps.sleep(0.5)
+                #
+                #     except:
+                #         pass
 
     # Disconnect after processing all files
     try:
