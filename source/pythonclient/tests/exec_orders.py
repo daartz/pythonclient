@@ -16,10 +16,10 @@ port_list = [port_perso_prod(), port_pro_prod(), port_perso_test()]
 
 # index_pro = ['USX','EUROX','US IPO','US9A', 'US9B', 'US9C','CANADA', 'ITALY','SPAIN','BELGIUM','GERMANY','NDL',
 # 'FRANCE','EUROFRANCE'] index_pro = ['US','EUROPE',"CANADA","US IPO"]
-index_pro = ["US IPO", "US", "CANADA", "EUROFORCE", "DJI", "NASDAQ", "SP500"]
-index_pro_2 = ["CANADA", "US IPO" ,"US","DJI", "NASDAQ", "SP500"]
-index_perso = ["US IPO", "US", "CANADA","DJI", "NASDAQ", "SP500"]
-index_test = ["CANADA", "US IPO", "US9A", "US9B", "US9C", "US", "EUROPE"]
+index_pro = ["ETF", "US IPO", "US", "CANADA", "EUROFORCE", "DJI", "NASDAQ", "SP500"]
+index_pro_2 = ["ETF", "CANADA", "US IPO", "US","DJI", "NASDAQ", "SP500"]
+index_perso = ["ETF", "US IPO", "US", "CANADA","DJI", "NASDAQ", "SP500"]
+index_test = ["ETF", "CANADA", "US IPO", "US9A", "US9B", "US9C", "US", "EUROPE"]
 
 
 def process_reel_order(port_code, index, sendMail=True):
