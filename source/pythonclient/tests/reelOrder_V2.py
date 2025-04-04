@@ -17,6 +17,8 @@ def process_orders(port, index_list, sendMail=True):
     now = datetime.now()
     current_time = now.strftime("%H:%M")
 
+    devises_valides = ['USD', 'EUR', 'CAD', 'GBP', 'CHF', 'JPY', 'SEK', 'NOK']
+
     # Connection details to IBKR
     HOST = '127.0.0.1'
     PORT = port
@@ -81,8 +83,8 @@ def process_orders(port, index_list, sendMail=True):
 
     if port in [5001]:
         if levier <= multiple_levier:
-            orders = ['sell', 'buy', 'vad sell', 'vad buy']
-            orders = ['sell', 'buy', 'vad sell']
+            orders = ['sell', 'buy', 'vad sell', 'vad buy','vad hold']
+            orders = ['sell', 'buy', 'vad buy']
         else:
             print("*** LEVIER DEPASSE ***")
             orders = ['sell', 'vad buy']
@@ -94,7 +96,7 @@ def process_orders(port, index_list, sendMail=True):
             orders = ['sell']
     elif port in [4002]:
         # pass
-        orders = ['vad sell', 'vad buy', 'buy']
+        orders = ['vad sell', 'vad buy','sell']
 
     for country in index:
         print(country)
@@ -144,6 +146,10 @@ def process_orders(port, index_list, sendMail=True):
                 trailPercent = centieme(float(row['SL %']))
                 currency = row['DEVISE']
 
+                if currency not in devises_valides:
+                    print("*********DEVISE INVALIDE*************")
+                    continue
+
                 valq = 0
 
                 if "US" in country:
@@ -187,7 +193,7 @@ def process_orders(port, index_list, sendMail=True):
                 contract = app.create_contract(stock, secType, exchange, currency)
 
                 if order_type == "BUY":
-                    if ("US" or "CANADA") in country and hour < 16:
+                    if ("US" or "CANADA" or "ETF") in country and hour < 16:
                         continue
                     if "EURO" in country and hour < 10:
                         continue
@@ -299,7 +305,7 @@ def process_orders(port, index_list, sendMail=True):
 
                     if port in ['5001', '4001'] and row['MARKET'] not in ['DJI', 'SP500', 'CANADA', 'NASDAQ']:
                         continue
-
+                    #
                     if country in ['DJI', 'SP500', 'CANADA', 'NASDAQ'] and hour < 16:
                         continue
                     if "EURO" in country and hour < 10:
@@ -326,17 +332,14 @@ def process_orders(port, index_list, sendMail=True):
                         app.add_order(contract, order)
 
                         # Calculer le trailing stop pour protéger la position
-                        trailAmt = price - stop_loss_price
+                        trailAmt = round(price * 0.08, 2)
 
-                        trailStopPrice = stop_loss_price
+                        trailStopPrice = round(price * 1.08, 2)
 
-                        if "US" in country or "CANADA" in country:
-                            order = stop_order(quantity, StopPrice=round(trailStopPrice, 2), action="BUY")
+                        order = trailing_stop_order(quantity, action="BUY", trailStopPrice=trailStopPrice,
+                                                    trailAmt=trailAmt,
+                                                    trailPercent=8)
 
-                        else:
-                            order = app.trailing_stop_order(quantity, action="BUY", trailStopPrice=trailStopPrice,
-                                                            trailAmt=trailAmt,
-                                                            trailPercent=trailPercent)
                         order.outsideRth = False
                         app.add_order(contract, order)
                         tps.sleep(0.5)
@@ -387,6 +390,51 @@ def process_orders(port, index_list, sendMail=True):
                             tps.sleep(0.5)
                     except:
                         pass
+
+                # elif order_type == "VAD HOLD":
+                #     #
+                #     # if port in ['5001', '4001'] :
+                #     #     continue
+                #     # elif order_type == "VAD HOLD":
+                #     try:
+                #
+                #         if app.find_position(stock):
+                #
+                #             orderId_list = app.orderId_present(stock, "BUY", currency=currency)
+                #
+                #             if orderId_list:
+                #                 try:
+                #                     for num in orderId_list:
+                #                         app.cancelOrder(num)
+                #                         tps.sleep(1)
+                #
+                #                 except Exception as e:
+                #                     print(e)
+                #
+                #             else:
+                #
+                #                 print("OrderId is empty")
+                #
+                #             quantity = abs(app.getPosition(stock))
+                #             print(quantity)
+                #
+                #
+                #             # Calculer le trailing stop pour protéger la position
+                #             trailAmt = round(price * 0.08, 2)
+                #
+                #             trailStopPrice = round(price * 1.08, 2)
+                #
+                #             order = trailing_stop_order(quantity, action="BUY", trailStopPrice=trailStopPrice,
+                #                                         trailAmt=trailAmt,
+                #                                         trailPercent=8)
+                #
+                #             order.outsideRth = False
+                #             order.account = ID_ACCOUNT
+                #             app.add_order(contract, order)
+                #             tps.sleep(0.5)
+                #
+                #     except:
+                #         pass
 
     # Disconnect after processing all files
     try:

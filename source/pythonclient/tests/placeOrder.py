@@ -124,14 +124,15 @@ def trailing_stop_order(quantity, action='SELL', trailStopPrice=None, trailAmt=N
     order.firmQuoteOnly = False
     order.timeInForce = 'GTC'
     order.transmit = True
+    order.trailPercent = trailPercent
+    order.auxPrice = trailAmt
 
     if trailStopPrice is not None:
         order.trailStopPrice = trailStopPrice
+    #
+    # if trailPercent is not None:
+    #     order.trailPercent = trailPercent  # Pourcentage du suivi
 
-    if trailAmt is not None:
-        order.auxPrice = trailAmt  # Montant du suivi en points absolus
-    elif trailPercent is not None:
-        order.trailPercent = trailPercent  # Pourcentage du suivi
 
     print("Trailing stop order created - quantity : " + str(quantity) + " - trailPercent : " + str(
         trailPercent) + " - trailAmt : " + str(
@@ -233,14 +234,15 @@ class TradingApp(EWrapper, EClient):
         order.firmQuoteOnly = False
         order.timeInForce = 'GTC'
         order.transmit = True
+        order.trailPercent = trailPercent
+        order.auxPrice = trailAmt
 
         if trailStopPrice is not None:
             order.trailStopPrice = trailStopPrice
+        #
+        # if trailPercent is not None:
+        #     order.trailPercent = trailPercent  # Pourcentage du suivi
 
-        if trailAmt is not None:
-            order.auxPrice = trailAmt  # Montant du suivi en points absolus
-        elif trailPercent is not None:
-            order.trailPercent = trailPercent  # Pourcentage du suivi
 
         print("(" + self.port_code + ") Trailing stop order created - quantity : " + str(
             quantity) + " - trailPercent : " + str(
@@ -498,6 +500,7 @@ class TradingApp(EWrapper, EClient):
     #     print("Error: ", reqId, " ", errorCode, " ", errorString)
     #     if advancedOrderRejectJson:
     #         print("Advanced order rejection info:", advancedOrderRejectJson)
+
 
 def centieme(val):
     # Valeur initiale

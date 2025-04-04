@@ -2,6 +2,7 @@ import csv
 import os
 import threading
 import time
+import traceback
 from datetime import datetime, timedelta
 from send_mail import *
 from connection_port import *
@@ -148,12 +149,15 @@ def main_openOrder(port):
     thread.start()
 
     time.sleep(1)  # Allow some time for the connection to establish
-
-    #  Retrieve all open orders
-    app.reqOpenOrders()
-    time.sleep(3)
-    # Retrieve specific orderId
-    print(app.all_orderId())
+    try:
+        #  Retrieve all open orders
+        app.reqOpenOrders()
+        time.sleep(3)
+        # Retrieve specific orderId
+        print(app.all_orderId())
+    except Exception as e:
+        error_message = f"An unexpected error occurred: {e}\n\nTraceback:\n{traceback.format_exc()}"
+        print(error_message)
 
     # time.sleep(2)  # Wait for orders to be returned and processed
 
@@ -163,6 +167,6 @@ def main_openOrder(port):
 
     app.disconnect()  # Disconnect when done
 #
-# if __name__ == "__main__":
-#     port_code = 5001  # Assuming port() function returns your port code
-#     main_openOrder(port_code)
+if __name__ == "__main__":
+    port_code = 5001  # Assuming port() function returns your port code
+    main_openOrder(port_code)

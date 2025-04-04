@@ -44,17 +44,17 @@ for port in port_list:
     threads.append(portfolio_thread)
 
 for port in port_list:
-    if port == 4001:
+    if port == 4001 and hour > 10 :
         open_order_thread = threading.Thread(target=process_reel_order, args=(port, index_perso, True,))
         open_order_thread.start()
         threads.append(open_order_thread)
 
-    elif port == 5001:
+    elif port == 5001 and hour > 10 :
         open_order_thread = threading.Thread(target=process_reel_order, args=(port, index_pro, True,))
         open_order_thread.start()
         threads.append(open_order_thread)
     #
-    else:
+    elif port == 4002:
         # if hour < 20:
         print("TEST " + str(hour))
         open_order_thread = threading.Thread(target=process_reel_order, args=(port, index_test, True,))
