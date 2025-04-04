@@ -82,6 +82,7 @@ def process_orders(port, index_list, sendMail=True):
     if port in [5001]:
         if levier <= multiple_levier:
             orders = ['sell', 'buy', 'vad sell', 'vad buy']
+            orders = ['sell', 'buy', 'vad sell']
         else:
             print("*** LEVIER DEPASSE ***")
             orders = ['sell', 'vad buy']
@@ -92,8 +93,8 @@ def process_orders(port, index_list, sendMail=True):
             print("*** LEVIER DEPASSE ***")
             orders = ['sell']
     elif port in [4002]:
-        pass
-        # orders = ['vad sell', 'vad buy', 'buy']
+        # pass
+        orders = ['vad sell', 'vad buy', 'buy']
 
     for country in index:
         print(country)
@@ -141,32 +142,29 @@ def process_orders(port, index_list, sendMail=True):
                 exchange = "SMART"
                 stop_loss_price = centieme(float(row['SL']))
                 trailPercent = centieme(float(row['SL %']))
+                currency = row['DEVISE']
 
                 valq = 0
 
                 if "US" in country:
-                    currency = "USD"
                     if port in [4001]:
                         valq += 400
                     else:
                         valq += 600
 
                 elif "CANADA" in country:
-                    currency = "CAD"
                     if port in [4001]:
                         valq += 450
                     else:
                         valq += 600
 
                 elif "ETF" in country:
-                    currency = "USD"
                     if port in [4001]:
                         valq += 600
                     else:
                         valq += 600
 
                 else:
-                    currency = "EUR"
                     valq += 400
 
                 order_type = row['ORDER']
@@ -292,8 +290,8 @@ def process_orders(port, index_list, sendMail=True):
                         print(e)
                         pass
 
-
-                elif order_type == "VAD SELL":  # Vente à découvert
+                # Vente à découvert
+                elif order_type == "VAD SELL":
 
                     if quantity == 0:
                         print("0 stock")
