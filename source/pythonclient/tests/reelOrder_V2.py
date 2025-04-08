@@ -83,7 +83,7 @@ def process_orders(port, index_list, sendMail=True):
 
     if port in [5001]:
         if levier <= multiple_levier:
-            orders = ['sell', 'buy', 'vad sell', 'vad buy','vad hold']
+            # orders = ['sell', 'buy', 'vad sell', 'vad buy','vad hold']
             orders = ['sell', 'buy', 'vad buy']
         else:
             print("*** LEVIER DEPASSE ***")
