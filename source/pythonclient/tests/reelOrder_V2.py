@@ -1,4 +1,5 @@
 import time as tps
+import traceback
 
 import pandas as pd
 
@@ -50,14 +51,17 @@ def process_orders(port, index_list, sendMail=True):
 
     print(f"({port}) NetLiquidation : " + str(netLiquidation))
 
-    if port != 4002:
-        levier = round(stockMarketValue / netLiquidation, 2)
+    try:
 
-        print(f"({port}) Levier : " + str(levier))
+        if port != 4002:
+            levier = round(stockMarketValue / netLiquidation, 2)
+            print(f"({port}) Levier : " + str(levier))
+            buyingPower = round((netLiquidation * multiple_levier) - stockMarketValue, 2)
 
-        buyingPower = round((netLiquidation * multiple_levier) - stockMarketValue, 2)
-
-        print(f"({port}) BuyingPower : " + str(buyingPower))
+            print(f"({port}) BuyingPower : " + str(buyingPower))
+    except Exception as e:
+        error_message = f"An unexpected error occurred: {e}\n\nTraceback:\n{traceback.format_exc()}"
+        print(error_message)
 
     file = f"C:\\TWS API\\source\\pythonclient\\tests\\Data\\portfolio_{port}.csv"
 
@@ -156,22 +160,22 @@ def process_orders(port, index_list, sendMail=True):
                     if port in [4001]:
                         valq += 400
                     else:
-                        valq += 600
+                        valq += 800
 
                 elif "CANADA" in country:
                     if port in [4001]:
                         valq += 450
                     else:
-                        valq += 600
+                        valq += 800
 
                 elif "ETF" in country:
                     if port in [4001]:
-                        valq += 600
+                        valq += 1000
                     else:
-                        valq += 600
+                        valq += 1000
 
                 else:
-                    valq += 400
+                    valq += 500
 
                 order_type = row['ORDER']
 
@@ -193,14 +197,14 @@ def process_orders(port, index_list, sendMail=True):
                 contract = app.create_contract(stock, secType, exchange, currency)
 
                 if order_type == "BUY":
-                    if ("US" or "CANADA" or "ETF") in country and hour < 16:
+                    if ("US" or "CANADA" or "ETF") in country and hour < 13:
                         continue
                     if "EURO" in country and hour < 10:
                         continue
 
-                    if port != 4002 and buyingPower < 0:
-                        print("BuyingPower < 0")
-                        continue
+                    # if port != 4002 and buyingPower < 0:
+                    #     print("BuyingPower < 0")
+                    #     continue
 
                     if nb_stock > max_stock:
                         print("Maximum number of stocks reached")
