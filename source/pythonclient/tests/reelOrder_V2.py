@@ -98,9 +98,9 @@ def process_orders(port, index_list, sendMail=True):
         else:
             print("*** LEVIER DEPASSE ***")
             orders = ['sell']
-    elif port in [4002]:
-        # pass
-        orders = ['vad sell', 'vad buy','sell']
+    # elif port in [4002]:
+    #     # pass
+    #     orders = ['vad sell', 'vad buy','sell']
 
     for country in index:
         print(country)
