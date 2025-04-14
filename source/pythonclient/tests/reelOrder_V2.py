@@ -87,14 +87,14 @@ def process_orders(port, index_list, sendMail=True):
 
     if port in [5001]:
         if levier <= multiple_levier:
-            # orders = ['sell', 'buy', 'vad sell', 'vad buy','vad hold']
-            orders = ['sell', 'buy', 'vad buy']
+            # orders = ['sell', 'buy', 'vad sell', 'vad buy']
+            orders = ['sell',  'vad buy']
         else:
             print("*** LEVIER DEPASSE ***")
             orders = ['sell', 'vad buy']
     elif port in [4001]:
         if levier <= multiple_levier:
-            orders = ['sell', 'buy']
+            orders = ['sell','buy']
         else:
             print("*** LEVIER DEPASSE ***")
             orders = ['sell']
@@ -156,23 +156,23 @@ def process_orders(port, index_list, sendMail=True):
 
                 valq = 0
 
-                if "US" in country:
+                if "US" in country or country in ['DJI', 'SP500', 'NASDAQ']:
                     if port in [4001]:
-                        valq += 400
+                        valq += 500
                     else:
-                        valq += 800
+                        valq += 600
 
                 elif "CANADA" in country:
                     if port in [4001]:
                         valq += 450
                     else:
-                        valq += 800
+                        valq += 600
 
                 elif "ETF" in country:
                     if port in [4001]:
-                        valq += 1000
+                        valq += 1200
                     else:
-                        valq += 1000
+                        valq += 1500
 
                 else:
                     valq += 500
@@ -194,17 +194,20 @@ def process_orders(port, index_list, sendMail=True):
                     if price < 1:
                         continue
 
+                if ("US" or "ETF") in country and hour < 16:
+                    continue
+                if "EURO" in country and hour < 10:
+                    continue
+                if country in ['DJI', 'SP500', 'CANADA', 'NASDAQ'] and hour < 16:
+                    continue
+
                 contract = app.create_contract(stock, secType, exchange, currency)
 
                 if order_type == "BUY":
-                    if ("US" or "CANADA" or "ETF") in country and hour < 13:
-                        continue
-                    if "EURO" in country and hour < 10:
-                        continue
 
-                    # if port != 4002 and buyingPower < 0:
-                    #     print("BuyingPower < 0")
-                    #     continue
+                    if port != 4002 and buyingPower < 0:
+                        print("BuyingPower < 0")
+                        continue
 
                     if nb_stock > max_stock:
                         print("Maximum number of stocks reached")
@@ -231,7 +234,7 @@ def process_orders(port, index_list, sendMail=True):
 
                         order = buy_order(quantity)
                         # order.outsideRth = True
-                        order.account = ID_ACCOUNT
+                        # order.account = ID_ACCOUNT
                         app.add_order(contract, order)
 
                         stop_loss_price = centieme(price * 0.90)  # 90% du prix d'achat
@@ -256,11 +259,6 @@ def process_orders(port, index_list, sendMail=True):
                         pass
 
                 elif order_type == "SELL":
-
-                    if ("US" or "CANADA") in country and hour < 16:
-                        continue
-                    if "EURO" in country and hour < 10:
-                        continue
 
                     try:
 
@@ -309,11 +307,6 @@ def process_orders(port, index_list, sendMail=True):
 
                     if port in ['5001', '4001'] and row['MARKET'] not in ['DJI', 'SP500', 'CANADA', 'NASDAQ']:
                         continue
-                    #
-                    if country in ['DJI', 'SP500', 'CANADA', 'NASDAQ'] and hour < 16:
-                        continue
-                    if "EURO" in country and hour < 10:
-                        continue
 
                     try:
                         # Vérifier si une position courte existe déjà pour l'action
@@ -354,11 +347,6 @@ def process_orders(port, index_list, sendMail=True):
                 elif order_type == "VAD BUY":  # Couvrir une position short
 
                     if port in ['5001', '4001'] and row['MARKET'] not in ['DJI', 'SP500', 'CANADA', 'NASDAQ']:
-                        continue
-
-                    if country in ['DJI', 'SP500', 'CANADA', 'NASDAQ'] and hour < 16:
-                        continue
-                    if "EURO" in country and hour < 10:
                         continue
 
                     try:
