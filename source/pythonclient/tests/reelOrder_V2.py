@@ -6,6 +6,7 @@ import pandas as pd
 from marketHours import *
 from placeOrder import *
 from portfolio import *
+from currency_conversion import *
 
 
 def process_orders(port, index_list, sendMail=True):
@@ -94,7 +95,8 @@ def process_orders(port, index_list, sendMail=True):
             orders = ['sell', 'vad buy']
     elif port in [4001]:
         if levier <= multiple_levier:
-            orders = ['sell','buy']
+            # orders = ['sell','buy']
+            orders = ['sell']
         else:
             print("*** LEVIER DEPASSE ***")
             orders = ['sell']
@@ -170,12 +172,15 @@ def process_orders(port, index_list, sendMail=True):
 
                 elif "ETF" in country:
                     if port in [4001]:
-                        valq += 1200
-                    else:
                         valq += 1500
+                    else:
+                        valq += 2000
 
                 else:
                     valq += 500
+
+                valq = convert_from_euro(valq, currency)
+                print("Value in currency : "+ str(valq) + " " + currency)
 
                 order_type = row['ORDER']
 
@@ -204,6 +209,9 @@ def process_orders(port, index_list, sendMail=True):
                 contract = app.create_contract(stock, secType, exchange, currency)
 
                 if order_type == "BUY":
+
+                    if "EURO" in country:
+                        continue
 
                     if port != 4002 and buyingPower < 0:
                         print("BuyingPower < 0")
@@ -300,6 +308,7 @@ def process_orders(port, index_list, sendMail=True):
 
                 # Vente à découvert
                 elif order_type == "VAD SELL":
+
 
                     if quantity == 0:
                         print("0 stock")
