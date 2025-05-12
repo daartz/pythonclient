@@ -56,11 +56,13 @@ def process_orders(port, index_list, sendMail=True):
 
         if port != 4002:
             levier = round(stockMarketValue / netLiquidation, 2)
+
             print(f"({port}) Levier : " + str(levier))
             buyingPower = round((netLiquidation * multiple_levier) - stockMarketValue, 2)
 
             print(f"({port}) BuyingPower : " + str(buyingPower))
     except Exception as e:
+        levier = 1
         error_message = f"An unexpected error occurred: {e}\n\nTraceback:\n{traceback.format_exc()}"
         print(error_message)
 
@@ -88,15 +90,15 @@ def process_orders(port, index_list, sendMail=True):
 
     if port in [5001]:
         if levier <= multiple_levier:
-            # orders = ['sell', 'buy', 'vad sell', 'vad buy']
-            orders = ['sell',  'vad buy']
+            orders = ['sell', 'buy', 'vad sell', 'vad buy']
+            # orders = ['sell',  'vad buy']
         else:
             print("*** LEVIER DEPASSE ***")
             orders = ['sell', 'vad buy']
     elif port in [4001]:
         if levier <= multiple_levier:
-            # orders = ['sell','buy']
-            orders = ['sell']
+            orders = ['sell','buy']
+            # orders = ['sell']
         else:
             print("*** LEVIER DEPASSE ***")
             orders = ['sell']
@@ -151,6 +153,7 @@ def process_orders(port, index_list, sendMail=True):
                 stop_loss_price = centieme(float(row['SL']))
                 trailPercent = centieme(float(row['SL %']))
                 currency = row['DEVISE']
+                print(currency)
 
                 if currency not in devises_valides:
                     print("*********DEVISE INVALIDE*************")
@@ -177,7 +180,7 @@ def process_orders(port, index_list, sendMail=True):
                         valq += 2000
 
                 else:
-                    valq += 500
+                    valq += 600
 
                 valq = convert_from_euro(valq, currency)
                 print("Value in currency : "+ str(valq) + " " + currency)
@@ -199,7 +202,7 @@ def process_orders(port, index_list, sendMail=True):
                     if price < 1:
                         continue
 
-                if ("US" or "ETF") in country and hour < 16:
+                if "US" in country and hour < 16:
                     continue
                 if "EURO" in country and hour < 10:
                     continue
@@ -209,9 +212,6 @@ def process_orders(port, index_list, sendMail=True):
                 contract = app.create_contract(stock, secType, exchange, currency)
 
                 if order_type == "BUY":
-
-                    if "EURO" in country:
-                        continue
 
                     if port != 4002 and buyingPower < 0:
                         print("BuyingPower < 0")

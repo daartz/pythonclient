@@ -1,7 +1,7 @@
 import requests
 import pandas as pd
 import os
-
+file = "C:\\TWS API\\source\\pythonclient\\tests\\exchange_rates.csv"
 def get_rates_frankfurter(base="EUR", symbols=None):
     if symbols is None:
         symbols = ['USD', 'EUR', 'CAD', 'GBP', 'CHF', 'JPY', 'SEK', 'NOK','DKK','PLN','ISK','RON','HUF']
@@ -17,7 +17,7 @@ def get_rates_frankfurter(base="EUR", symbols=None):
         print(f"❌ Erreur de connexion : {e}")
         return {}
 
-def save_rates_to_csv(rates, filename="exchange_rates.csv"):
+def save_rates_to_csv(rates, filename=file):
     df = pd.DataFrame([
         {"From": "EUR", "To": k, "Rate": v}
         for k, v in rates.items()
@@ -25,7 +25,7 @@ def save_rates_to_csv(rates, filename="exchange_rates.csv"):
     df.to_csv(filename, index=False)
     print(f"✅ Fichier de taux enregistré dans : {filename}")
 
-def convert_from_euro(amount, to_currency, filename="exchange_rates.csv"):
+def convert_from_euro(amount, to_currency, filename=file):
     if not os.path.exists(filename):
         print("❌ Fichier des taux manquant. Lancer d'abord la mise à jour.")
         return None
@@ -37,7 +37,7 @@ def convert_from_euro(amount, to_currency, filename="exchange_rates.csv"):
     rate = row.iloc[0]["Rate"]
     return amount * rate
 
-def convert_to_euro(amount, from_currency, filename="exchange_rates.csv"):
+def convert_to_euro(amount, from_currency, filename=file):
     if not os.path.exists(filename):
         print("❌ Fichier des taux manquant. Lancer d'abord la mise à jour.")
         return None
