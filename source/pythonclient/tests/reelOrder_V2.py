@@ -14,6 +14,7 @@ def process_orders(port, index_list, sendMail=True):
     global levier, buyingPower
     today = datetime.now().date()
     hour = datetime.now().hour
+    print("Actual hour :" + str(hour))
     minute = datetime.now().minute
     multiple_levier = 5
     now = datetime.now()
@@ -59,10 +60,8 @@ def process_orders(port, index_list, sendMail=True):
 
             print(f"({port}) Levier : " + str(levier))
             buyingPower = round((netLiquidation * multiple_levier) - stockMarketValue, 2)
-
             print(f"({port}) BuyingPower : " + str(buyingPower))
     except Exception as e:
-        levier = 1
         error_message = f"An unexpected error occurred: {e}\n\nTraceback:\n{traceback.format_exc()}"
         print(error_message)
 
@@ -81,14 +80,19 @@ def process_orders(port, index_list, sendMail=True):
     ID_ACCOUNT = ""
 
     if port == 4001:
-        max_stock = 150
+        max_stock = 120
         ID_ACCOUNT = 'U11227042'
     elif port == 5001:
-        max_stock = 260
+        max_stock = 200
         ID_ACCOUNT = 'U16043850'
     orders = []
 
+    print(port)
+    print(levier)
+    print(multiple_levier)
+
     if port in [5001]:
+
         if levier <= multiple_levier:
             orders = ['sell', 'buy', 'vad sell', 'vad buy']
             # orders = ['sell',  'vad buy']
@@ -182,7 +186,8 @@ def process_orders(port, index_list, sendMail=True):
                 else:
                     valq += 600
 
-                valq = convert_from_euro(valq, currency)
+                if currency != 'EUR':
+                    valq = round(convert_from_euro(valq, currency),2)
                 print("Value in currency : "+ str(valq) + " " + currency)
 
                 order_type = row['ORDER']

@@ -141,7 +141,8 @@ class TestApp(EWrapper, EClient):
 
         try:
             data = pd.DataFrame(self.porfolio)
-            data["SENS"] = data["Position"].apply(lambda x: "LONG" if x > 0 else "SHORT")
+            data["SENS"] = data["Position"].apply(lambda x: "LONG" if x > 0 else ("SHORT" if x < 0 else "NEUTRE"))
+            data["W/L"] = data["UnrealizedPNL"].apply(lambda x: "W" if x > 0 else ("L" if x < 0 else "N"))
             df = data[data['UnrealizedPNL'] != 0.0]
             nb = df["Symbol"].count()
             df = data[data['RealizedPNL'] != 0.0]
