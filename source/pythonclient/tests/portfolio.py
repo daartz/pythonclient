@@ -141,27 +141,54 @@ class TestApp(EWrapper, EClient):
 
         try:
             data = pd.DataFrame(self.porfolio)
-            data["SENS"] = data["Position"].apply(lambda x: "LONG" if x > 0 else ("SHORT" if x < 0 else "NEUTRE"))
-            data["W/L"] = data["UnrealizedPNL"].apply(lambda x: "W" if x > 0 else ("L" if x < 0 else "N"))
-            df = data[data['UnrealizedPNL'] != 0.0]
-            nb = df["Symbol"].count()
-            df = data[data['RealizedPNL'] != 0.0]
-            nb2 = df["Symbol"].count()
+
+            # Ajout des colonnes SENS et résultats W/L
+            data["SENS"] = data["Position"].apply(lambda x: "Long" if x > 0 else ("Short" if x < 0 else "Neutre"))
+            data["Ur W/L"] = data["UnrealizedPNL"].apply(lambda x: "W" if x > 0 else ("L" if x < 0 else "N"))
+            data["R W/L"] = data["RealizedPNL"].apply(lambda x: "W" if x > 0 else ("L" if x < 0 else "N"))
+
+            # Stats sur PNL non réalisé
+            df_unr = data[data['UnrealizedPNL'] != 0.0]
+            nb_unr = len(df_unr)
+            ur_nb_win = len(df_unr[df_unr["Ur W/L"] == "W"])
+            ur_nb_lose = len(df_unr[df_unr["Ur W/L"] == "L"])
+            percentage_ur_win = round(ur_nb_win / nb_unr * 100, 2) if nb_unr else 0
+            percentage_ur_lose = round(ur_nb_lose / nb_unr * 100, 2) if nb_unr else 0
+
+            # Stats sur PNL réalisé
+            df_r = data[data['RealizedPNL'] != 0.0]
+            nb_r = len(df_r)
+            r_nb_win = len(df_r[df_r["R W/L"] == "W"])
+            r_nb_lose = len(df_r[df_r["R W/L"] == "L"])
+            percentage_r_win = round(r_nb_win / nb_r * 100, 2) if nb_r else 0
+            percentage_r_lose = round(r_nb_lose / nb_r * 100, 2) if nb_r else 0
+
+            # Valeur globale
             mktValue = round(data["MarketValue"].sum(), 2)
             unrpnl = round(data["UnrealizedPNL"].sum(), 2)
-            txUnrpnl = round(((unrpnl / mktValue)) * 100, 2)
             rpnl = round(data["RealizedPNL"].sum(), 2)
+            txUnrpnl = round((unrpnl / mktValue) * 100, 2) if mktValue else 0
 
             data.to_csv(portfolio_file, index=False)
 
             if self.send_email:
-                html_data = '<p>(TWS) Portfolio : ' + self.accountName[0] + ' </p><p>Nb of Stocks (URLZ): ' + str(nb) \
-                            + ' </p><p>Market Value : ' + str(mktValue) \
-                            + '</p><p>Unrealized PNL : ' + \
-                            str(unrpnl) + ' (' + str(txUnrpnl) + ' %)' + ' </p><p>Nb of Stocks (RLZ): ' + str(nb2) \
-                            + '</p><p>Realized PNL : ' + str(rpnl) + '</p>' + data.to_html(index=False)
-                send_mail_html("IBKR TWS Portfolio " + self.accountName[0], html_data)
+                html_resume = f"""
+                   <h3>IBKR Portfolio Summary ({self.accountName[0]})</h3>
+                   <ul>
+                       <li><b>Nb of Stocks (Unrealized PNL)</b>: {nb_unr}</li>
+                       <li><b>Unrealized PNL</b>: {unrpnl} ({txUnrpnl}%)</li>
+                       <li><b>Win %</b>: {percentage_ur_win}% | <b>Lose %</b>: {percentage_ur_lose}%</li>
+                       <li><b>Nb of Stocks (Realized PNL)</b>: {nb_r}</li>
+                       <li><b>Realized PNL</b>: {rpnl}</li>
+                       <li><b>Win %</b>: {percentage_r_win}% | <b>Lose %</b>: {percentage_r_lose}%</li>
+                       <li><b>Total Market Value</b>: {mktValue}</li>
+                   </ul>
+                   """
 
+                html_table = data.to_html(index=False, border=1)
+
+                html_data = html_resume + "<h3>Détail du Portefeuille</h3>" + html_table
+                send_mail_html("IBKR TWS Portfolio " + self.accountName[0], html_data)
         except:
 
             if self.send_email:
@@ -182,7 +209,7 @@ class TestApp(EWrapper, EClient):
             data.to_csv(account_value_file, index=False)
 
             if self.send_email:
-                html_data = '<p>(TWS) Account Value : ' + self.accountname2[0] + '</p>' + data.to_html(index = False)
+                html_data = '<p>(TWS) Account Value : ' + self.accountname2[0] + '</p>' + data.to_html(index=False)
                 send_mail_html("IBKR TWS Account Value " + self.accountname2[0], html_data)
 
         except:
