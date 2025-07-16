@@ -167,21 +167,21 @@ def process_orders(port, index_list, sendMail=True):
 
                 if "US" in country or country in ['DJI', 'SP500', 'NASDAQ']:
                     if port in [4001]:
-                        valq += 500
-                    else:
                         valq += 600
+                    else:
+                        valq += 700
 
                 elif "CANADA" in country:
                     if port in [4001]:
-                        valq += 450
-                    else:
                         valq += 600
+                    else:
+                        valq += 700
 
                 elif "ETF" in country:
                     if port in [4001]:
-                        valq += 1500
+                        valq += 700
                     else:
-                        valq += 2000
+                        valq += 700
 
                 else:
                     valq += 600
