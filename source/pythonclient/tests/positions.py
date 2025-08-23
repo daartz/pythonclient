@@ -16,9 +16,9 @@ class Trading_App(EWrapper, EClient):
 
     def position(self, account, contract: Contract, pos, avgCost):
         # Callback qui reçoit les informations de position
-        if pos > 0:
+        if pos >= 1:
             position_type = "BUY"  # Position longue
-        elif pos < 0:
+        elif pos <= -1:
             position_type = "SELL"  # Position courte
         else:
             position_type = "NEUTRAL"

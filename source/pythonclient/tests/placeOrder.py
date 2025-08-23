@@ -133,7 +133,6 @@ def trailing_stop_order(quantity, action='SELL', trailStopPrice=None, trailAmt=N
     # if trailPercent is not None:
     #     order.trailPercent = trailPercent  # Pourcentage du suivi
 
-
     print("Trailing stop order created - quantity : " + str(quantity) + " - trailPercent : " + str(
         trailPercent) + " - trailAmt : " + str(
         trailAmt) + " - trailStopPrice : " + str(
@@ -242,7 +241,6 @@ class TradingApp(EWrapper, EClient):
         #
         # if trailPercent is not None:
         #     order.trailPercent = trailPercent  # Pourcentage du suivi
-
 
         print("(" + self.port_code + ") Trailing stop order created - quantity : " + str(
             quantity) + " - trailPercent : " + str(
@@ -441,7 +439,7 @@ class TradingApp(EWrapper, EClient):
         data = pd.read_csv(file)
 
         try:
-            if (data['Symbol'] == stock).any():
+            if ((data['Symbol'] == stock) & (data['Position'].abs() >= 1)).any():
                 print("(" + self.port_code + ") " + stock + ": stock present")
                 present = True
             else:
