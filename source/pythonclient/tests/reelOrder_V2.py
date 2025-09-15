@@ -16,7 +16,7 @@ def process_orders(port, index_list, sendMail=True):
     hour = datetime.now().hour
     print("Actual hour :" + str(hour))
     minute = datetime.now().minute
-    multiple_levier = 5
+    multiple_levier = 1.10
     now = datetime.now()
     current_time = now.strftime("%H:%M")
 
@@ -72,7 +72,8 @@ def process_orders(port, index_list, sendMail=True):
     index = index_list
 
     df = data[data['UnrealizedPNL'] != 0.0]
-    nb_stock = df['Stock'].count()
+    df2 = df[abs(df['Position']) >= 1]
+    nb_stock = df2['Stock'].count()
     print(f"({port}) Nb stocks: " + str(nb_stock))
 
     max_stock = 500
@@ -101,7 +102,7 @@ def process_orders(port, index_list, sendMail=True):
             orders = ['sell', 'vad buy']
     elif port in [4001]:
         if levier <= multiple_levier:
-            orders = ['sell','buy']
+            orders = ['sell', 'buy']
             # orders = ['sell']
         else:
             print("*** LEVIER DEPASSE ***")
@@ -167,19 +168,19 @@ def process_orders(port, index_list, sendMail=True):
 
                 if "US" in country or country in ['DJI', 'SP500', 'NASDAQ']:
                     if port in [4001]:
-                        valq += 600
+                        valq += 400
                     else:
-                        valq += 700
+                        valq += 600
 
                 elif "CANADA" in country:
                     if port in [4001]:
-                        valq += 600
+                        valq += 400
                     else:
-                        valq += 700
+                        valq += 600
 
                 elif "ETF" in country:
                     if port in [4001]:
-                        valq += 700
+                        valq += 400
                     else:
                         valq += 700
 
@@ -187,15 +188,18 @@ def process_orders(port, index_list, sendMail=True):
                     valq += 600
 
                 if currency != 'EUR':
-                    valq = round(convert_from_euro(valq, currency),2)
-                print("Value in currency : "+ str(valq) + " " + currency)
+                    valq = round(convert_from_euro(valq, currency), 2)
+                print("Value in currency : " + str(valq) + " " + currency)
 
                 order_type = row['ORDER']
 
                 quantity = valq // row['BUY']
 
-                # if quantity == 0:
-                #     quantity = 1
+                if quantity == 0:
+                    if row['BUY'] < 1000:
+                        quantity = 1
+                    else:
+                        continue
 
                 price = row['BUY']
 
@@ -226,7 +230,7 @@ def process_orders(port, index_list, sendMail=True):
                         print("Maximum number of stocks reached")
                         continue
 
-                    if row["SCORE"] < 4:
+                    if row["SCORE"] < 0:
                         print("Score inférieur à 5")
                         continue
 
@@ -314,9 +318,12 @@ def process_orders(port, index_list, sendMail=True):
                 # Vente à découvert
                 elif order_type == "VAD SELL":
 
-
                     if quantity == 0:
                         print("0 stock")
+                        continue
+
+                    if nb_stock > max_stock:
+                        print("Maximum number of stocks reached")
                         continue
 
                     if port in ['5001', '4001'] and row['MARKET'] not in ['DJI', 'SP500', 'CANADA', 'NASDAQ']:
