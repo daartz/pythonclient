@@ -222,6 +222,9 @@ def process_orders(port, index_list, sendMail=True):
 
                 if order_type == "BUY":
 
+                    if "CANADA" in country:
+                        continue
+
                     if port != 4002 and buyingPower < 0:
                         print("BuyingPower < 0")
                         continue
@@ -237,6 +240,7 @@ def process_orders(port, index_list, sendMail=True):
                     if quantity == 0:
                         print("0 stock")
                         continue
+
 
                     try:
                         if app.find_position(stock):
