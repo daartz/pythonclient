@@ -16,7 +16,7 @@ def process_orders(port, index_list, sendMail=True):
     hour = datetime.now().hour
     print("Actual hour :" + str(hour))
     minute = datetime.now().minute
-    multiple_levier = 1.10
+    multiple_levier = 1.00
     now = datetime.now()
     current_time = now.strftime("%H:%M")
 
