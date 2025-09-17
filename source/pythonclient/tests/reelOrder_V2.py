@@ -180,7 +180,7 @@ def process_orders(port, index_list, sendMail=True):
 
                 elif "ETF" in country:
                     if port in [4001]:
-                        valq += 400
+                        valq += 500
                     else:
                         valq += 700
 
