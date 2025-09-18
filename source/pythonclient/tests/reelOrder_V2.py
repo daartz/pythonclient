@@ -166,17 +166,17 @@ def process_orders(port, index_list, sendMail=True):
 
                 valq = 0
 
-                if "US" in country or country in ['DJI', 'SP500', 'NASDAQ']:
+                if country in ['DJI', 'SP500', 'NASDAQ','CANADA']:
                     if port in [4001]:
                         valq += 400
                     else:
                         valq += 600
 
-                elif "CANADA" in country:
+                elif "IPO" in country:
                     if port in [4001]:
-                        valq += 400
+                        valq += 300
                     else:
-                        valq += 600
+                        valq += 400
 
                 elif "ETF" in country:
                     if port in [4001]:
@@ -195,7 +195,7 @@ def process_orders(port, index_list, sendMail=True):
 
                 quantity = valq // row['BUY']
 
-                if quantity == 0:
+                if quantity == 0 :
                     if row['BUY'] < 1000:
                         quantity = 1
                     else:
@@ -240,7 +240,6 @@ def process_orders(port, index_list, sendMail=True):
                     if quantity == 0:
                         print("0 stock")
                         continue
-
 
                     try:
                         if app.find_position(stock):
