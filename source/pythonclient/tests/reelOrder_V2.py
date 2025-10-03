@@ -16,7 +16,11 @@ def process_orders(port, index_list, sendMail=True):
     hour = datetime.now().hour
     print("Actual hour :" + str(hour))
     minute = datetime.now().minute
+
+    buyingPower = 0
+    levier = 0
     multiple_levier = 1
+
     now = datetime.now()
     current_time = now.strftime("%H:%M")
 
@@ -57,7 +61,6 @@ def process_orders(port, index_list, sendMail=True):
 
         if port != 4002:
             levier = round(stockMarketValue / netLiquidation, 2)
-
             print(f"({port}) Levier : " + str(levier))
             buyingPower = round((netLiquidation * multiple_levier) - stockMarketValue, 2)
             print(f"({port}) BuyingPower : " + str(buyingPower))
@@ -81,10 +84,8 @@ def process_orders(port, index_list, sendMail=True):
     ID_ACCOUNT = ""
 
     if port == 4001:
-        max_stock = 120
         ID_ACCOUNT = 'U11227042'
     elif port == 5001:
-        max_stock = 200
         ID_ACCOUNT = 'U16043850'
     orders = []
 
@@ -100,13 +101,16 @@ def process_orders(port, index_list, sendMail=True):
         else:
             print("*** LEVIER DEPASSE ***")
             orders = ['sell', 'vad buy']
+
     elif port in [4001]:
+
         if levier <= multiple_levier:
             orders = ['sell', 'buy']
             # orders = ['sell']
         else:
             print("*** LEVIER DEPASSE ***")
             orders = ['sell']
+
     # elif port in [4002]:
     #     # pass
     #     orders = ['sell', 'buy', 'vad sell', 'vad buy']
