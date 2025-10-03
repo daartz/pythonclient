@@ -11,7 +11,7 @@ from currency_conversion import *
 
 def process_orders(port, index_list, sendMail=True):
     # Current date in YYYY-MM-DD format
-    global levier, buyingPower
+
     today = datetime.now().date()
     hour = datetime.now().hour
     print("Actual hour :" + str(hour))
@@ -455,6 +455,7 @@ def process_orders(port, index_list, sendMail=True):
                 #
                 #     except:
                 #         pass
+
 
     # Disconnect after processing all files
     try:
