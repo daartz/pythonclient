@@ -16,7 +16,7 @@ def process_orders(port, index_list, sendMail=True):
     hour = datetime.now().hour
     print("Actual hour :" + str(hour))
     minute = datetime.now().minute
-    multiple_levier = 1.00
+    multiple_levier = 1
     now = datetime.now()
     current_time = now.strftime("%H:%M")
 
@@ -109,7 +109,7 @@ def process_orders(port, index_list, sendMail=True):
             orders = ['sell']
     # elif port in [4002]:
     #     # pass
-    #     orders = ['vad sell', 'vad buy','sell']
+    #     orders = ['sell', 'buy', 'vad sell', 'vad buy']
 
     for country in index:
         print(country)
@@ -168,19 +168,19 @@ def process_orders(port, index_list, sendMail=True):
 
                 if country in ['DJI', 'SP500', 'NASDAQ','CANADA']:
                     if port in [4001]:
-                        valq += 400
+                        valq += 500
                     else:
                         valq += 600
 
                 elif "IPO" in country:
                     if port in [4001]:
-                        valq += 300
-                    else:
                         valq += 400
+                    else:
+                        valq += 500
 
                 elif "ETF" in country:
                     if port in [4001]:
-                        valq += 500
+                        valq += 600
                     else:
                         valq += 700
 
@@ -229,12 +229,16 @@ def process_orders(port, index_list, sendMail=True):
                         print("BuyingPower < 0")
                         continue
 
+                    if levier > multiple_levier:
+                        print("Levier > " + str(multiple_levier))
+                        continue
+
                     if nb_stock > max_stock:
                         print("Maximum number of stocks reached")
                         continue
 
                     if row["SCORE"] < 0:
-                        print("Score inférieur à 5")
+                        print("Score inférieur à 0")
                         continue
 
                     if quantity == 0:
