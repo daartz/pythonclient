@@ -16,9 +16,9 @@ port_list = [port_perso_prod(), port_pro_prod(), port_perso_test()]
 
 # index_pro = ['USX','EUROX','US IPO','US9A', 'US9B', 'US9C','CANADA', 'ITALY','SPAIN','BELGIUM','GERMANY','NDL',
 # 'FRANCE','EUROFRANCE'] index_pro = ['US','EUROPE',"CANADA","US IPO"]
-index_pro = ["CANADA", "US IPO","DJI", "NASDAQ", "SP500", "EURO ETF", "US ETF"]
-index_pro_2 = ["EURO ETF", "US ETF","US IPO", "CANADA", "US", "DJI", "NASDAQ", "SP500"]
-index_perso = [ "EURO ETF", "US ETF", "US IPO", "US", "CANADA", "DJI", "NASDAQ", "SP500"]
+index_pro = ["CANADA", "US IPO","US","DJI", "NASDAQ", "SP500", "EURO ETF", "US ETF"]
+index_pro_2 = ["EURO ETF", "US ETF","US IPO","US", "CANADA", "DJI", "NASDAQ", "SP500"]
+index_perso = [ "EURO ETF", "US ETF", "US IPO", "US","CANADA", "DJI", "NASDAQ", "SP500"]
 index_test = ["EURO ETF", "US ETF", "CANADA", "US IPO", "US9A", "US9B", "US9C", "US", "EUROPE"]
 
 
