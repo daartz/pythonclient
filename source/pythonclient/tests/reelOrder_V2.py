@@ -178,9 +178,9 @@ def process_orders(port, index_list, sendMail=True):
 
                 elif "IPO" in country:
                     if port in [4001]:
-                        valq += 400
+                        valq += 300
                     else:
-                        valq += 500
+                        valq += 400
 
                 elif "ETF" in country:
                     if port in [4001]:
@@ -218,8 +218,6 @@ def process_orders(port, index_list, sendMail=True):
 
                 if "EURO" in country and hour < 10:
                     continue
-                if "IPO" in country and hour < 20:
-                    continue
                 if country in ['DJI', 'SP500', 'CANADA', 'NASDAQ',"US"] and hour < 16:
                     continue
 
@@ -227,6 +225,8 @@ def process_orders(port, index_list, sendMail=True):
 
                 if order_type == "BUY":
 
+                    if "IPO" in country and hour < 20:
+                        continue
                     if "CANADA" in country:
                         continue
 
