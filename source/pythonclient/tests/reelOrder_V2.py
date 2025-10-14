@@ -178,9 +178,9 @@ def process_orders(port, index_list, sendMail=True):
 
                 elif "IPO" in country:
                     if port in [4001]:
-                        valq += 300
+                        valq += 450
                     else:
-                        valq += 400
+                        valq += 550
 
                 elif "ETF" in country:
                     if port in [4001]:
