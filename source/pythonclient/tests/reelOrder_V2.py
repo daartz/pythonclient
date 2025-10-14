@@ -227,8 +227,6 @@ def process_orders(port, index_list, sendMail=True):
 
                     if "IPO" in country and hour < 20:
                         continue
-                    if "CANADA" in country:
-                        continue
 
                     if port != 4002 and buyingPower < 0:
                         print("BuyingPower < 0")
