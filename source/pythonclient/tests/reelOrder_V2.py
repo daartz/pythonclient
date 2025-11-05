@@ -218,7 +218,7 @@ def process_orders(port, index_list, sendMail=True):
 
                 if "EURO" in country and hour < 10:
                     continue
-                if country in ['DJI', 'SP500', 'CANADA', 'NASDAQ',"US"] and hour < 16:
+                if country in ['DJI', 'SP500', 'CANADA', 'NASDAQ',"US IPO"] and hour < 16:
                     continue
 
                 contract = app.create_contract(stock, secType, exchange, currency)
