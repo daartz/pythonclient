@@ -170,11 +170,11 @@ def process_orders(port, index_list, sendMail=True):
 
                 valq = 0
 
-                if country in ['DJI', 'SP500', 'NASDAQ','CANADA']:
+                if country in ['DJI', 'SP500', 'NASDAQ', 'CANADA']:
                     if port in [4001]:
                         valq += 500
                     else:
-                        valq += 600
+                        valq += 800
 
                 elif "IPO" in country:
                     if port in [4001]:
@@ -186,7 +186,7 @@ def process_orders(port, index_list, sendMail=True):
                     if port in [4001]:
                         valq += 600
                     else:
-                        valq += 700
+                        valq += 800
 
                 else:
                     valq += 600
@@ -199,8 +199,8 @@ def process_orders(port, index_list, sendMail=True):
 
                 quantity = valq // row['BUY']
 
-                if quantity == 0 :
-                    if row['BUY'] < 1000:
+                if quantity == 0:
+                    if row['BUY'] < 1200:
                         quantity = 1
                     else:
                         continue
@@ -215,10 +215,9 @@ def process_orders(port, index_list, sendMail=True):
                     if price < 1:
                         continue
 
-
-                if "EURO" in country and hour < 10:
+                if "EURO" in country and hour < 12:
                     continue
-                if country in ['DJI', 'SP500', 'CANADA', 'NASDAQ',"US IPO"] and hour < 16:
+                if country in ['DJI', 'SP500', 'CANADA', 'NASDAQ', "US IPO", "US"] and hour < 18:
                     continue
 
                 contract = app.create_contract(stock, secType, exchange, currency)
@@ -336,7 +335,7 @@ def process_orders(port, index_list, sendMail=True):
                         print("Maximum number of stocks reached")
                         continue
 
-                    if port in ['5001', '4001'] and row['MARKET'] not in ['DJI', 'SP500', 'CANADA', 'NASDAQ']:
+                    if port in ['5001', '4001'] and row['MARKET'] not in ['DJI', 'SP500', 'CANADA', 'NASDAQ','EURO ETF']:
                         continue
 
                     try:
@@ -377,7 +376,7 @@ def process_orders(port, index_list, sendMail=True):
 
                 elif order_type == "VAD BUY":  # Couvrir une position short
 
-                    if port in ['5001', '4001'] and row['MARKET'] not in ['DJI', 'SP500', 'CANADA', 'NASDAQ']:
+                    if port in ['5001', '4001'] and row['MARKET'] not in ['DJI', 'SP500', 'CANADA', 'NASDAQ','EURO ETF']:
                         continue
 
                     try:
@@ -458,7 +457,6 @@ def process_orders(port, index_list, sendMail=True):
                 #
                 #     except:
                 #         pass
-
 
     # Disconnect after processing all files
     try:
