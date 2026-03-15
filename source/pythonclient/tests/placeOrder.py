@@ -208,6 +208,7 @@ class TradingApp(EWrapper, EClient):
         order.firmQuoteOnly = False
         order.transmit = True
 
+
         print("SELL Order created : " + order.orderType + " - Qty : " + str(
             order.totalQuantity) + " - " + order.action)
         return order
@@ -493,6 +494,23 @@ class TradingApp(EWrapper, EClient):
             print("Error occurred:", e)
 
         return position
+
+
+    def getExchange(self, stock):
+        exchange = ""
+        file = f"C:\\TWS API\\source\\pythonclient\\tests\\Data\\portfolio_{self.port_code}.csv"
+        data = pd.read_csv(file)
+
+        try:
+            filtered_data = data[data['Exchange'] == stock]
+            if not filtered_data.empty:
+                exchange = filtered_data.iloc[0]['Exchange']
+                if exchange != "":
+                    print("(" + self.port_code + ") Exchange for " + stock + " : " + str(exchange))
+        except Exception as e:
+            print("Error occurred:", e)
+
+        return exchange
 
     # def error(self, reqId, errorCode, errorString, advancedOrderRejectJson=None):
     #     print("Error: ", reqId, " ", errorCode, " ", errorString)

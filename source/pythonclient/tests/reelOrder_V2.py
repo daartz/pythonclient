@@ -9,6 +9,10 @@ from portfolio import *
 from currency_conversion import *
 
 
+def time_delay_3():
+    time.sleep(0.3)
+
+
 def process_orders(port, index_list, sendMail=True):
     # Current date in YYYY-MM-DD format
 
@@ -19,7 +23,7 @@ def process_orders(port, index_list, sendMail=True):
 
     buyingPower = 0
     levier = 0
-    multiple_levier = 1
+    multiple_levier = 1.20
 
     now = datetime.now()
     current_time = now.strftime("%H:%M")
@@ -96,20 +100,21 @@ def process_orders(port, index_list, sendMail=True):
     if port in [5001]:
 
         if levier <= multiple_levier:
-            orders = ['sell', 'buy', 'vad sell', 'vad buy']
+            orders = ['sell', 'buy', 'vad sell', 'vad buy', 'vad hold', 'hold']
             # orders = ['sell',  'vad buy']
         else:
             print("*** LEVIER DEPASSE ***")
-            orders = ['sell', 'vad buy']
+            orders = ['sell', 'vad buy', 'vad hold', 'hold']
+
 
     elif port in [4001]:
 
         if levier <= multiple_levier:
-            orders = ['sell', 'buy']
+            orders = ['sell', 'buy', 'hold']
             # orders = ['sell']
         else:
             print("*** LEVIER DEPASSE ***")
-            orders = ['sell']
+            orders = ['sell', 'hold']
 
     # elif port in [4002]:
     #     # pass
@@ -170,11 +175,11 @@ def process_orders(port, index_list, sendMail=True):
 
                 valq = 0
 
-                if country in ['DJI', 'SP500', 'NASDAQ', 'CANADA']:
+                if country in ['DJI', 'SP500', 'NASDAQ', 'CANADA', 'EUROFORCE']:
                     if port in [4001]:
                         valq += 500
                     else:
-                        valq += 800
+                        valq += 600
 
                 elif "IPO" in country:
                     if port in [4001]:
@@ -184,9 +189,9 @@ def process_orders(port, index_list, sendMail=True):
 
                 elif "ETF" in country:
                     if port in [4001]:
-                        valq += 600
+                        valq += 550
                     else:
-                        valq += 800
+                        valq += 600
 
                 else:
                     valq += 600
@@ -198,6 +203,8 @@ def process_orders(port, index_list, sendMail=True):
                 order_type = row['ORDER']
 
                 quantity = valq // row['BUY']
+
+                vad_quantity = (valq * 0.80) // row['BUY']
 
                 if quantity == 0:
                     if row['BUY'] < 1200:
@@ -251,7 +258,7 @@ def process_orders(port, index_list, sendMail=True):
                         if app.find_position(stock):
                             continue
 
-                        tps.sleep(1)
+                        time_delay_3()
 
                         orderId_list = app.orderId_present(stock, "BUY", currency=currency)
 
@@ -263,7 +270,6 @@ def process_orders(port, index_list, sendMail=True):
                         # order.account = ID_ACCOUNT
                         app.add_order(contract, order)
 
-                        stop_loss_price = centieme(price * 0.90)  # 90% du prix d'achat
                         stop_order_pnl = stop_order(quantity, StopPrice=stop_loss_price, action="SELL")
                         stop_order_pnl.account = ID_ACCOUNT
                         app.add_order(contract, stop_order_pnl)
@@ -276,13 +282,13 @@ def process_orders(port, index_list, sendMail=True):
                         # # order.outsideRth = True
                         # app.add_order(contract, order)
 
-                        tps.sleep(0.5)
+                        time_delay_3()
 
                         nb_stock += 1
                         buyingPower -= valq
 
-                    except:
-                        pass
+                    except Exception as e:
+                        print(e)
 
                 elif order_type == "SELL":
 
@@ -296,7 +302,7 @@ def process_orders(port, index_list, sendMail=True):
                                 try:
                                     for num in orderId_list:
                                         app.cancelOrder(num)
-                                        tps.sleep(1)
+                                        time_delay_3()
 
                                 except Exception as e:
                                     print(e)
@@ -312,13 +318,65 @@ def process_orders(port, index_list, sendMail=True):
 
                             #                                 trailPercent=trailPercent)
 
-                            tps.sleep(0.5)
+                            time_delay_3()
 
                             order = app.sell_order(quantity)
                             order.account = ID_ACCOUNT
                             order.outsideRth = False
+
                             app.add_order(contract, order)
-                            tps.sleep(0.5)
+                            time_delay_3()
+
+                    except Exception as e:
+                        print(e)
+                        pass
+
+                elif order_type == "HOLD" and hour >= 21:
+
+                    try:
+
+                        if app.find_position(stock):
+
+                            orderId_list = app.orderId_present(stock, "SELL", currency=currency)
+
+                            if orderId_list:
+
+                                try:
+
+                                    for num in orderId_list:
+                                        app.cancelOrder(num)
+
+                                        time_delay_3()
+
+                                except Exception as e:
+
+                                    print(e)
+
+                            else:
+
+                                print("OrderId is empty")
+
+                            quantity = app.getPosition(stock)
+                            print(quantity)
+
+                            time_delay_3()
+
+                            stop_order_pnl = stop_order(quantity, StopPrice=stop_loss_price, action="SELL")
+                            stop_order_pnl.account = ID_ACCOUNT
+
+                            # # Trading ORH
+                            # if hour >= 22:
+                            #     exchange = app.getExchange(stock)
+                            #     print(exchange)
+                            #
+                            #     contract.exchange = "SMART"
+                            #     contract.primaryExchange = exchange
+                            #     stop_order_pnl.tif = "DAY"
+                            #     stop_order_pnl.outsideRth = True
+
+
+                            app.add_order(contract, stop_order_pnl)
+                            time_delay_3()
 
                     except Exception as e:
                         print(e)
@@ -335,7 +393,8 @@ def process_orders(port, index_list, sendMail=True):
                         print("Maximum number of stocks reached")
                         continue
 
-                    if port in ['5001', '4001'] and row['MARKET'] not in ['DJI', 'SP500', 'CANADA', 'NASDAQ','EURO ETF']:
+                    if port in ['5001', '4001'] and row['MARKET'] not in ['DJI', 'SP500', 'CANADA', 'NASDAQ',
+                                                                          'EURO ETF']:
                         continue
 
                     try:
@@ -345,7 +404,7 @@ def process_orders(port, index_list, sendMail=True):
                             print("Position present ? " + str(app.find_position(stock)))
                             continue
 
-                        tps.sleep(1)
+                        time_delay_3()
 
                         orderId_list = app.orderId_present(stock, "SELL", currency=currency)
 
@@ -369,14 +428,15 @@ def process_orders(port, index_list, sendMail=True):
 
                         order.outsideRth = False
                         app.add_order(contract, order)
-                        tps.sleep(0.5)
+                        time_delay_3()
 
-                    except:
-                        pass
+                    except Exception as e:
+                        print(e)
 
                 elif order_type == "VAD BUY":  # Couvrir une position short
 
-                    if port in ['5001', '4001'] and row['MARKET'] not in ['DJI', 'SP500', 'CANADA', 'NASDAQ','EURO ETF']:
+                    if port in ['5001', '4001'] and row['MARKET'] not in ['DJI', 'SP500', 'CANADA', 'NASDAQ',
+                                                                          'EURO ETF']:
                         continue
 
                     try:
@@ -392,7 +452,7 @@ def process_orders(port, index_list, sendMail=True):
                                 try:
                                     for num in orderId_list:
                                         app.cancelOrder(num)
-                                        tps.sleep(0.5)
+                                        time_delay_3()
 
                                 except Exception as e:
                                     print(e)
@@ -401,62 +461,66 @@ def process_orders(port, index_list, sendMail=True):
                                 print("OrderId is empty")
 
                             quantity = abs(app.getPosition(stock))  # Quantité pour couvrir la position short
-                            tps.sleep(1)
-
+                            time_delay_3()
                             print(quantity)
+
                             # Placer l'ordre de rachat pour couvrir la vente à découvert
                             order = buy_order(quantity)
                             order.outsideRth = False
                             order.account = ID_ACCOUNT
-                            app.add_order(contract, order)
-                            tps.sleep(0.5)
-                    except:
-                        pass
 
-                # elif order_type == "VAD HOLD":
-                #     #
-                #     # if port in ['5001', '4001'] :
-                #     #     continue
-                #     # elif order_type == "VAD HOLD":
-                #     try:
-                #
-                #         if app.find_position(stock):
-                #
-                #             orderId_list = app.orderId_present(stock, "BUY", currency=currency)
-                #
-                #             if orderId_list:
-                #                 try:
-                #                     for num in orderId_list:
-                #                         app.cancelOrder(num)
-                #                         tps.sleep(1)
-                #
-                #                 except Exception as e:
-                #                     print(e)
-                #
-                #             else:
-                #
-                #                 print("OrderId is empty")
-                #
-                #             quantity = abs(app.getPosition(stock))
-                #             print(quantity)
-                #
-                #
-                #             # Calculer le trailing stop pour protéger la position
-                #             trailAmt = round(price * 0.08, 2)
-                #
-                #             trailStopPrice = round(price * 1.08, 2)
-                #
-                #             order = trailing_stop_order(quantity, action="BUY", trailStopPrice=trailStopPrice,
-                #                                         trailAmt=trailAmt,
-                #                                         trailPercent=8)
-                #
-                #             order.outsideRth = False
-                #             order.account = ID_ACCOUNT
-                #             app.add_order(contract, order)
-                #             tps.sleep(0.5)
-                #
-                #     except:
-                #         pass
+                            app.add_order(contract, order)
+                            time_delay_3()
+
+                    except Exception as e:
+                        print(e)
+
+                elif order_type == "VAD HOLD" and hour >= 21:
+                    #
+                    # if port in ['5001', '4001'] :
+                    #     continue
+                    # elif order_type == "VAD HOLD":
+                    try:
+
+                        if app.find_position(stock):
+
+                            orderId_list = app.orderId_present(stock, "BUY", currency=currency)
+
+                            if orderId_list:
+                                try:
+                                    for num in orderId_list:
+                                        app.cancelOrder(num)
+                                        tps.sleep(1)
+
+                                except Exception as e:
+                                    print(e)
+
+                            else:
+
+                                print("OrderId is empty")
+
+                            quantity = abs(app.getPosition(stock))
+                            print(quantity)
+
+                            stop_order_pnl = stop_order(quantity, StopPrice=stop_loss_price, action="BUY")
+
+                            stop_order_pnl.account = ID_ACCOUNT
+
+                            # # Trading ORH
+                            # if hour >= 22:
+                            #     exchange = app.getExchange(stock)
+                            #     print(exchange)
+                            #
+                            #     contract.exchange = "SMART"
+                            #     contract.primaryExchange = exchange
+                            #     stop_order_pnl.tif = "DAY"
+                            #     stop_order_pnl.outsideRth = True
+
+                            app.add_order(contract, stop_order_pnl)
+                            time_delay_3()
+
+                    except Exception as e:
+                        print(e)
 
     # Disconnect after processing all files
     try:
