@@ -361,7 +361,8 @@ def process_orders(port, index_list, sendMail=True):
 
                             time_delay_3()
 
-                            stop_order_pnl = stop_order(quantity, StopPrice=stop_loss_price, action="SELL")
+                            limit = centieme(stop_loss_price * 0.95)
+                            stop_order_pnl = stop_limit_order(quantity, StopPrice=stop_loss_price, Limit= limit, action="SELL")
                             stop_order_pnl.account = ID_ACCOUNT
 
                             # # Trading ORH
@@ -502,7 +503,9 @@ def process_orders(port, index_list, sendMail=True):
                             quantity = abs(app.getPosition(stock))
                             print(quantity)
 
-                            stop_order_pnl = stop_order(quantity, StopPrice=stop_loss_price, action="BUY")
+                            limit = centieme(stop_loss_price * 1.05)
+                            stop_order_pnl = stop_limit_order(quantity, StopPrice=stop_loss_price, Limit=limit,
+                                                              action="BUY")
 
                             stop_order_pnl.account = ID_ACCOUNT
 

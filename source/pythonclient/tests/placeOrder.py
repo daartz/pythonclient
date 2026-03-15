@@ -74,6 +74,22 @@ def stop_order(quantity, StopPrice, action="SELL"):
     return order
 
 
+def stop_limit_order(quantity, StopPrice, Limit, action="SELL"):
+    order = Order()
+    order.action = action
+    order.orderType = "STP LMT"
+    order.auxPrice = StopPrice
+    order.lmtPrice = Limit
+    order.totalQuantity = quantity
+    order.eTradeOnly = False
+    order.firmQuoteOnly = False
+    order.transmit = True
+    order.outsideRth = True
+
+    print("Stop Order created : " + order.orderType + " - Qty : " + str(order.totalQuantity) + " - " + order.action)
+    return order
+
+
 def sell_order(quantity):
     order = Order()
     order.orderType = "MKT"
@@ -207,7 +223,6 @@ class TradingApp(EWrapper, EClient):
         order.eTradeOnly = False
         order.firmQuoteOnly = False
         order.transmit = True
-
 
         print("SELL Order created : " + order.orderType + " - Qty : " + str(
             order.totalQuantity) + " - " + order.action)
@@ -494,7 +509,6 @@ class TradingApp(EWrapper, EClient):
             print("Error occurred:", e)
 
         return position
-
 
     def getExchange(self, stock):
         exchange = ""
