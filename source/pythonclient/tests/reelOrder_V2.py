@@ -7,6 +7,7 @@ from marketHours import *
 from placeOrder import *
 from portfolio import *
 from currency_conversion import *
+from primary_exchange import *
 
 
 def time_delay_3():
@@ -159,14 +160,23 @@ def process_orders(port, index_list, sendMail=True):
 
                 stock = row['STOCK']
 
+                info = get_expected_contract_info(stock)
+
                 if "." in stock:
                     stock = '.'.join(row['STOCK'].split('.')[:-1])
+
+                raw_stock = str(row["STOCK"]).strip().upper()
+                stock, suffix = raw_stock.rsplit(".", 1) if "." in raw_stock else (raw_stock, None)
+
+                expected = SUFFIX_MAP.get(suffix, {})
+                primary_exchange = expected.get("primaryExchange")
+                currency = expected.get("currency")
 
                 secType = "STK"
                 exchange = "SMART"
                 stop_loss_price = centieme(float(row['SL']))
-                trailPercent = centieme(float(row['SL %']))
-                currency = row['DEVISE']
+                # trailPercent = centieme(float(row['SL %']))
+                # currency = row['DEVISE']
                 print(currency)
 
                 if currency not in devises_valides:
@@ -222,12 +232,13 @@ def process_orders(port, index_list, sendMail=True):
                     if price < 1:
                         continue
 
-                if "EURO" in country and hour < 12:
+                if "EURO" in country and hour < 15:
                     continue
                 if country in ['DJI', 'SP500', 'CANADA', 'NASDAQ', "US IPO", "US"] and hour < 18:
                     continue
 
                 contract = app.create_contract(stock, secType, exchange, currency)
+                contract.primaryExchange = primary_exchange
 
                 if order_type == "BUY":
 
@@ -236,6 +247,9 @@ def process_orders(port, index_list, sendMail=True):
 
                     if port != 4002 and buyingPower < 0:
                         print("BuyingPower < 0")
+                        continue
+
+                    if port == 4001 and "EURO" in country:
                         continue
 
                     if levier > multiple_levier:
