@@ -24,7 +24,7 @@ def process_orders(port, index_list, sendMail=True):
 
     buyingPower = 0
     levier = 0
-    multiple_levier = 1.20
+    multiple_levier = 2
 
     now = datetime.now()
     current_time = now.strftime("%H:%M")
@@ -180,8 +180,12 @@ def process_orders(port, index_list, sendMail=True):
                 print(currency)
 
                 if currency not in devises_valides:
-                    print("*********DEVISE INVALIDE*************")
-                    continue
+
+                    if country in ['DJI', 'SP500', 'NASDAQ', "US IPO", "US"] :
+                        currency= 'USD'
+                    else:
+                        print("*********DEVISE INVALIDE*************")
+                        continue
 
                 valq = 0
 
@@ -234,11 +238,13 @@ def process_orders(port, index_list, sendMail=True):
 
                 if "EURO" in country and hour < 15:
                     continue
-                if country in ['DJI', 'SP500', 'CANADA', 'NASDAQ', "US IPO", "US"] and hour < 18:
+                if country in ['DJI', 'SP500', 'CANADA', 'NASDAQ', "US IPO", "US"] and hour < 16:
                     continue
 
                 contract = app.create_contract(stock, secType, exchange, currency)
-                contract.primaryExchange = primary_exchange
+
+                if primary_exchange is not None:
+                    contract.primaryExchange = primary_exchange
 
                 if order_type == "BUY":
 
@@ -451,7 +457,7 @@ def process_orders(port, index_list, sendMail=True):
                 elif order_type == "VAD BUY":  # Couvrir une position short
 
                     if port in ['5001', '4001'] and row['MARKET'] not in ['DJI', 'SP500', 'CANADA', 'NASDAQ',
-                                                                          'EURO ETF']:
+                                                                          'EURO ETF', 'EURO FORCE']:
                         continue
 
                     try:
